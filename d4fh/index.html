@@ -14,6 +14,8 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 20px 0;
+      box-sizing: border-box;
     }
 
     .card {
@@ -24,6 +26,7 @@
       max-width: 700px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       animation: fadeIn 0.5s ease;
+      box-sizing: border-box;
     }
 
     h1 {
@@ -35,12 +38,33 @@
       line-height: 1.5;
     }
 
-    .coords,
     .answer-box {
       background: #f4f7f9;
       padding: 14px;
       border-radius: 10px;
       margin-top: 15px;
+    }
+
+    .audio-box {
+      background: linear-gradient(135deg, #235c70, #2f748c);
+      color: white;
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 15px;
+      box-shadow: 0 6px 18px rgba(35, 92, 112, 0.18);
+    }
+
+    .audio-title {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .audio-subtitle {
+      font-size: 0.92rem;
+      opacity: 0.95;
+      margin-bottom: 14px;
+      line-height: 1.4;
     }
 
     .audio-wrap {
@@ -50,7 +74,10 @@
 
     audio {
       width: 100%;
-      max-width: 420px;
+      display: block;
+      min-height: 48px;
+      border-radius: 10px;
+      background: white;
     }
 
     .label {
@@ -144,6 +171,74 @@
       margin-top: 10px;
       font-size: 0.9em;
       color: #666;
+      line-height: 1.5;
+    }
+
+    .small-note a {
+      color: #235c70;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 12px 0;
+        align-items: flex-start;
+      }
+
+      .card {
+        width: calc(100% - 20px);
+        padding: 18px;
+        border-radius: 12px;
+      }
+
+      .audio-box {
+        padding: 14px;
+      }
+
+      .audio-title {
+        font-size: 0.98rem;
+      }
+
+      .audio-subtitle {
+        font-size: 0.88rem;
+      }
+
+      .coord-line {
+        gap: 6px;
+        row-gap: 10px;
+        font-size: 1em;
+      }
+
+      .coord-line input {
+        padding: 12px 8px;
+        font-size: 16px;
+      }
+
+      .deg {
+        width: 52px;
+      }
+
+      .min-left {
+        width: 46px;
+      }
+
+      .min-right {
+        width: 58px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 1rem;
+      }
+
+      .preview {
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
     }
 
     @keyframes fadeIn {
@@ -164,9 +259,14 @@
 
     <p><strong>Přesuňte se na souřadnice:</strong></p>
 
-    <div class="coords">
+    <div class="audio-box">
+      <div class="audio-title">Zvuková stopa</div>
+      <div class="audio-subtitle">
+        Pusťte si nahrávku a podle ní určete správné souřadnice.
+      </div>
+
       <div class="audio-wrap">
-        <audio controls>
+        <audio controls preload="metadata">
           <source src="morseovka.mp3" type="audio/mpeg">
           Tvůj prohlížeč nepodporuje přehrávání audia.
         </audio>
@@ -197,7 +297,7 @@
       </div>
 
       <div class="preview" id="preview">N __° __.___′ E __° __.___′</div>
-      <div class="small-note">Pokud máte potíže s přehráním zvuku, klikněte <a href="https://youtu.be/h7fiDAR6C88"> zde</a></div>
+      <div class="small-note">Pokud máte potíže s přehráním zvuku, klikněte <a href="https://youtu.be/h7fiDAR6C88" target="_blank" rel="noopener noreferrer">zde</a></div>
 
       <div class="buttons">
         <button onclick="checkCoords()">Ověřit souřadnice</button>
