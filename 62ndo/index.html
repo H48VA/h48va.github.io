@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontrolní bod</title>
+
+<link rel="icon" href="/favicon.png">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(180deg, #eef3f5 0%, #dfe8ec 100%);
+  margin: 0;
+  padding: 16px;
+  min-height: 100vh;
+  color: #1f2d33;
+}
+
+.page {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+  animation: fadeIn 0.4s ease;
+}
+
+h1 {
+  color: #235c70;
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+}
+
+p {
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.coords-box {
+  background: linear-gradient(135deg, #235c70, #2f748c);
+  color: white;
+  padding: 16px;
+  border-radius: 14px;
+  margin-top: 14px;
+  box-shadow: 0 6px 18px rgba(35, 92, 112, 0.18);
+}
+
+.coords-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.coords {
+  font-family: monospace;
+  font-size: 1.05rem;
+  background: rgba(255,255,255,0.15);
+  padding: 10px;
+  border-radius: 8px;
+  word-break: break-word;
+}
+
+.buttons {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: none;
+  background: #235c70;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.92;
+}
+
+.hint {
+  margin-top: 18px;
+  font-size: 0.92rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.hint a {
+  color: #235c70;
+}
+
+@media (min-width: 700px) {
+  body {
+    padding: 28px;
+  }
+
+  .card {
+    padding: 26px;
+  }
+
+  .buttons {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+</head>
+<body>
+
+<div class="page">
+  <div class="card">
+    <h1>Kontrolní bod č. 6 – souřadnice</h1>
+
+ 
+
+  
+
+    <div class="coords-box">
+      <div class="coords-title">N49 doplnit</div>
+    
+    </div>
+
+    
+
+    
+  </div>
+</div>
+
+<script>
+function copyCoords() {
+  const text = document.getElementById("coords").innerText;
+  navigator.clipboard.writeText(text);
+  alert("Souřadnice zkopírovány");
+}
+</script>
+
+</body>
+</html>
