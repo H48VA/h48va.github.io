@@ -46,9 +46,7 @@ const EXTENDED_TABLE = [
   { start: "18:30", end: "18:59", values: ["11:15", "11:15", "10:30", "10:00", "09:30"] }
 ];
 
-let countdownInterval = null;
-let currentEndNormal = null;
-let currentEndCaptain = null;
+
 
 function toMinutes(timeString) {
   if (!timeString || !timeString.includes(":")) return 0;
@@ -185,8 +183,7 @@ function renderResults(result) {
     document.getElementById("latestDepartureUtc").textContent = "--:-- UTC";
     document.getElementById("latestDepartureCaptain").textContent = "--:-- local";
     document.getElementById("latestDepartureCaptainUtc").textContent = "--:-- UTC";
-    document.getElementById("countdownNormal").textContent = "--:--";
-    document.getElementById("countdownCaptain").textContent = "--:--";
+  
 
     infoBox.className = "status bad";
     infoBox.textContent = result.error;
@@ -240,32 +237,12 @@ infoText += ` Přepočet do UTC je udělaný s offsetem ${offsetFormatted}.`;
   infoBox.className = "status good";
   infoBox.textContent = infoText;
 
-  currentEndNormal = result.dutyEndLocal;
-  currentEndCaptain = result.dutyEndCaptainLocal;
-  updateCountdowns();
+
 }
 
-function getCountdownText(targetLocalMinutes) {
-  const now = getNowLocalMinutes();
-  let diff = targetLocalMinutes - now;
 
-  if (diff < 0) {
-    diff += 1440;
-  }
 
-  return minutesToDuration(diff);
-}
 
-function updateCountdowns() {
-  if (currentEndNormal === null || currentEndCaptain === null) {
-    document.getElementById("countdownNormal").textContent = "--:--";
-    document.getElementById("countdownCaptain").textContent = "--:--";
-    return;
-  }
-
-  document.getElementById("countdownNormal").textContent = getCountdownText(currentEndNormal);
-  document.getElementById("countdownCaptain").textContent = getCountdownText(currentEndCaptain);
-}
 
 function runCalculation() {
   const result = calculateResults();
@@ -274,10 +251,7 @@ function runCalculation() {
 
 document.getElementById("calculateBtn").addEventListener("click", runCalculation);
 
-if (countdownInterval) {
-  clearInterval(countdownInterval);
-}
-countdownInterval = setInterval(updateCountdowns, 30000);
+
 
 runCalculation();
 
