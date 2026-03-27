@@ -101,8 +101,44 @@ function lookupTableValue(table, reportMinutes, sectors) {
   return null;
 }
 
-function calculateStandbyReduction(sbyMinutes) {
-  return Math.max(0, sbyMinutes - 360);
+function overlapMinutes(startA, endA, startB, endB) {
+  const start = Math.max(startA, startB);
+  const end = Math.min(endA, endB);
+  return Math.max(0, end - start);
+}
+
+// Spočítá část SBY, která leží v denním okně 07:00–23:00 local
+function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes) {
+  const standbyStart = reportMinutes - sbyMinutes;
+  const standbyEnd = reportMinutes;
+
+  let countable = 0;
+
+  // projdeme všechny "dny", kterých se interval může dotknout
+  const firstDay = Math.floor(standbyStart / 1440);
+  const lastDay = Math.floor((standbyEnd - 1) / 1440);
+
+  for (let day = firstDay; day <= lastDay; day++) {
+    const dayOffset = day * 1440;
+
+    // započitatelné okno je 07:00–23:00
+    const countableStart = dayOffset + 7 * 60;   // 07:00
+    const countableEnd = dayOffset + 23 * 60;    // 23:00
+
+    countable += overlapMinutes(
+      standbyStart,
+      standbyEnd,
+      countableStart,
+      countableEnd
+    );
+  }
+
+  return countable;
+}
+
+function calculateStandbyReduction(reportMinutes, sbyMinutes) {
+  const countableStandby = calculateCountableStandbyMinutes(reportMinutes, sbyMinutes);
+  return Math.max(0, countableStandby - 360);
 }
 
 function calculateResults() {
@@ -128,7 +164,8 @@ const utcOffset = utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : u
   const captainExtraFromSelectedLimit = 120 - Math.max(0, plannedExtensionDifference);
   const captainExtraApplied = Math.max(0, captainExtraFromSelectedLimit);
 
-  const standbyReduction = calculateStandbyReduction(sby);
+ const countableStandby = calculateCountableStandbyMinutes(report, sby);
+const standbyReduction = calculateStandbyReduction(report, sby);
 
   const maxFdp = selectedTableFdp - standbyReduction;
   const maxFdpCaptain = selectedTableFdp + captainExtraApplied - standbyReduction;
@@ -151,6 +188,7 @@ const utcOffset = utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : u
     report,
     sectors,
     sby,
+    countableStandby,
     standbyReduction,
     lastLeg,
     taxi,
@@ -221,11 +259,15 @@ function renderResults(result) {
       `Služba je počítaná ze základní tabulky. Kapitánské prodloužení přidává ${minutesToDuration(result.captainExtraApplied)}.`;
   }
 
-  if (result.standbyReduction > 0) {
-    infoText += ` SBY zkrátila duty o ${minutesToDuration(result.standbyReduction)}.`;
-  } else {
-    infoText += ` SBY duty nezkrátila.`;
-  }
+  if (result.sby > 0) {
+  infoText += ` Z celkové SBY ${minutesToDuration(result.sby)} se pro krácení počítá ${minutesToDuration(result.countableStandby)} (mimo 23:00–07:00).`;
+}
+
+if (result.standbyReduction > 0) {
+  infoText += ` SBY zkrátila duty o ${minutesToDuration(result.standbyReduction)}.`;
+} else {
+  infoText += ` SBY duty nezkrátila.`;
+}
 
 const offsetSign = result.utcOffset >= 0 ? "+" : "-";
 const offsetAbs = Math.abs(result.utcOffset);
