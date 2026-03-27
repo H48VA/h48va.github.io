@@ -471,19 +471,7 @@
       Tabulka se vyhodnocuje podle lokálního času reportingu. UTC se dopočítává jen pro přehled do kokpitu.
     </div>
   </section>
-<script>
-  function toggleSbyFields() {
-    const hasSby = document.querySelector('input[name="hasSby"]:checked')?.value;
-    document.getElementById("sbyFields").style.display = hasSby === "yes" ? "block" : "none";
-  }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('input[name="hasSby"]').forEach(el => {
-      el.addEventListener("change", toggleSbyFields);
-    });
-    toggleSbyFields();
-  });
-</script>
   <script src="app.js"></script>
 <script>
   function toggleSbyFields() {
