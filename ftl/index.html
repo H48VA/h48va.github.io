@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDP Tool</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+body {
+  font-family: -apple-system;
+  background:#0b0f14;
+  color:white;
+  padding:15px;
+}
+.card {
+  background:#161b22;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+input, select {
+  width:100%;
+  padding:12px;
+  margin:5px 0 10px;
+  border-radius:10px;
+  border:none;
+  background:#0d1117;
+  color:white;
+  font-size:16px;
+}
+button {
+  width:100%;
+  padding:15px;
+  background:#238636;
+  border:none;
+  border-radius:12px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>✈️ FDP Tool (UTC)</h2>
+
+<div class="card">
+<label>Report UTC</label>
+<input type="time" id="report">
+
+<label>Sektory</label>
+<select id="sectors">
+<option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+</select>
+
+<label>SBY</label>
+<input type="time" id="sby" value="00:00">
+
+<label>Last leg</label>
+<input type="time" id="last">
+
+<label>Taxi</label>
+<input type="time" id="taxi" value="00:10">
+</div>
+
+<button onclick="calc()">Spočítat</button>
+
+<div class="card" id="out"></div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
