@@ -107,21 +107,17 @@ function overlapMinutes(startA, endA, startB, endB) {
   return Math.max(0, end - start);
 }
 
-// Spočítá část SBY, která leží v denním okně 07:00–23:00 local
-function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes) {
+// Základ: počítá se jen denní část 07:00–23:00
+function calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes) {
   const standbyStart = reportMinutes - sbyMinutes;
   const standbyEnd = reportMinutes;
 
   let countable = 0;
-
-  // projdeme všechny "dny", kterých se interval může dotknout
   const firstDay = Math.floor(standbyStart / 1440);
   const lastDay = Math.floor((standbyEnd - 1) / 1440);
 
   for (let day = firstDay; day <= lastDay; day++) {
     const dayOffset = day * 1440;
-
-    // započitatelné okno je 07:00–23:00
     const countableStart = dayOffset + 7 * 60;   // 07:00
     const countableEnd = dayOffset + 23 * 60;    // 23:00
 
@@ -136,9 +132,86 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes) {
   return countable;
 }
 
+// Pokud call time padne do 23:00–07:00, interval callTime→reporting
+// se má celý počítat jako denní držení.
+function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMinutes) {
+  const standbyStart = reportMinutes - sbyMinutes;
+  const standbyEnd = reportMinutes;
+
+  let countable = calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes);
+
+  const normalizedCall = ((callTimeMinutes % 1440) + 1440) % 1440;
+
+  if (!isNightMinute(normalizedCall)) {
+    return countable;
+  }
+
+  // najdeme správný výskyt call time uvnitř intervalu standbyStart→standbyEnd
+  const firstDay = Math.floor(standbyStart / 1440) - 1;
+  const lastDay = Math.floor(standbyEnd / 1440) + 1;
+
+  let effectiveCallAbsolute = null;
+
+  for (let day = firstDay; day <= lastDay; day++) {
+    const candidate = day * 1440 + normalizedCall;
+    if (candidate >= standbyStart && candidate <= standbyEnd) {
+      effectiveCallAbsolute = candidate;
+      break;
+    }
+  }
+
+  if (effectiveCallAbsolute === null) {
+    return countable;
+  }
+
+  const intervalStart = effectiveCallAbsolute;
+  const intervalEnd = standbyEnd;
+
+  // základ už počítá jen 07–23; my potřebujeme dopočítat noční část
+  // od call time do reportingu, která by jinak započítaná nebyla
+  const totalCallToReport = Math.max(0, intervalEnd - intervalStart);
+  let alreadyCountedInCallToReport = 0;
+
+  const firstOverlapDay = Math.floor(intervalStart / 1440);
+  const lastOverlapDay = Math.floor((intervalEnd - 1) / 1440);
+
+  for (let day = firstOverlapDay; day <= lastOverlapDay; day++) {
+    const dayOffset = day * 1440;
+    const dayStart = dayOffset + 7 * 60;
+    const dayEnd = dayOffset + 23 * 60;
+
+    alreadyCountedInCallToReport += overlapMinutes(
+      intervalStart,
+      intervalEnd,
+      dayStart,
+      dayEnd
+    );
+  }
+
+  const extraNightMinutesToAdd = totalCallToReport - alreadyCountedInCallToReport;
+
+  return countable + Math.max(0, extraNightMinutesToAdd);
+}
+
+function calculateStandbyReduction(countableStandby) {
+  return Math.max(0, countableStandby - 360);
+}
+  return countable;
+}
+
 function calculateStandbyReduction(reportMinutes, sbyMinutes) {
   const countableStandby = calculateCountableStandbyMinutes(reportMinutes, sbyMinutes);
   return Math.max(0, countableStandby - 360);
+}
+
+function isNightMinute(minuteOfDay) {
+  const normalized = ((minuteOfDay % 1440) + 1440) % 1440;
+  return normalized >= 1380 || normalized < 420; // 23:00–07:00
+}
+
+function getSelectedHasSby() {
+  const selected = document.querySelector('input[name="hasSby"]:checked');
+  return selected ? selected.value === "yes" : false;
 }
 
 function calculateResults() {
@@ -146,7 +219,9 @@ function calculateResults() {
 const utcOffsetHours = parseInt(document.getElementById("utcOffsetHours").value, 10);
 const utcOffsetHalf = parseInt(document.getElementById("utcOffsetHalf").value, 10);
 const utcOffset = utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : utcOffsetHalf / 60);  const sectors = parseInt(document.getElementById("sectors").value, 10);
-  const sby = toMinutes(document.getElementById("sby").value);
+ const hasSby = getSelectedHasSby();
+const sby = hasSby ? toMinutes(document.getElementById("sby").value) : 0;
+const sbyCallTime = hasSby ? toMinutes(document.getElementById("sbyCallTime").value) : null;
   const lastLeg = toMinutes(document.getElementById("lastLeg").value);
   const taxi = toMinutes(document.getElementById("taxi").value);
   const serviceType = getSelectedServiceType();
@@ -164,8 +239,11 @@ const utcOffset = utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : u
   const captainExtraFromSelectedLimit = 120 - Math.max(0, plannedExtensionDifference);
   const captainExtraApplied = Math.max(0, captainExtraFromSelectedLimit);
 
- const countableStandby = calculateCountableStandbyMinutes(report, sby);
-const standbyReduction = calculateStandbyReduction(report, sby);
+ const countableStandby = hasSby
+  ? calculateCountableStandbyMinutes(report, sby, sbyCallTime)
+  : 0;
+
+const standbyReduction = calculateStandbyReduction(countableStandby);
 
   const maxFdp = selectedTableFdp - standbyReduction;
   const maxFdpCaptain = selectedTableFdp + captainExtraApplied - standbyReduction;
@@ -190,6 +268,8 @@ const standbyReduction = calculateStandbyReduction(report, sby);
     sby,
     countableStandby,
     standbyReduction,
+    hasSby,
+    sbyCallTime,
     lastLeg,
     taxi,
     baseTableFdp,
@@ -259,14 +339,21 @@ function renderResults(result) {
       `Služba je počítaná ze základní tabulky. Kapitánské prodloužení přidává ${minutesToDuration(result.captainExtraApplied)}.`;
   }
 
-  if (result.sby > 0) {
-  infoText += ` Z celkové SBY ${minutesToDuration(result.sby)} se pro krácení počítá ${minutesToDuration(result.countableStandby)} (mimo 23:00–07:00).`;
-}
+if (result.hasSby) {
+  infoText += ` Celková SBY byla ${minutesToDuration(result.sby)}.`;
+  infoText += ` Pro krácení se počítá ${minutesToDuration(result.countableStandby)}.`;
 
-if (result.standbyReduction > 0) {
-  infoText += ` SBY zkrátila duty o ${minutesToDuration(result.standbyReduction)}.`;
+  if (result.sbyCallTime !== null && isNightMinute(result.sbyCallTime)) {
+    infoText += ` Call time ${minutesToTime(result.sbyCallTime)} spadl do 23:00–07:00, takže od call time do reportingu se vše počítá jako denní držení.`;
+  }
+
+  if (result.standbyReduction > 0) {
+    infoText += ` SBY zkrátila duty o ${minutesToDuration(result.standbyReduction)}.`;
+  } else {
+    infoText += ` SBY duty nezkrátila.`;
+  }
 } else {
-  infoText += ` SBY duty nezkrátila.`;
+  infoText += ` Před reportingem nebylo SBY.`;
 }
 
 const offsetSign = result.utcOffset >= 0 ? "+" : "-";
