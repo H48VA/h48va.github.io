@@ -230,8 +230,13 @@ function renderResults(result) {
     infoText += ` SBY duty nezkrátila.`;
   }
 
-  infoText += ` Přepočet do UTC je udělaný s offsetem UTC${result.utcOffset >= 0 ? "+" : ""}${result.utcOffset}.`;
+const offsetSign = result.utcOffset >= 0 ? "+" : "-";
+const offsetAbs = Math.abs(result.utcOffset);
+const offsetHoursPart = Math.floor(offsetAbs);
+const offsetMinutesPart = Math.round((offsetAbs - offsetHoursPart) * 60);
+const offsetFormatted = `UTC${offsetSign}${offsetHoursPart}:${String(offsetMinutesPart).padStart(2, "0")}`;
 
+infoText += ` Přepočet do UTC je udělaný s offsetem ${offsetFormatted}.`;
   infoBox.className = "status good";
   infoBox.textContent = infoText;
 
