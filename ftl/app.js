@@ -21,7 +21,6 @@ const BASE_TABLE = [
   { start: "19:00", end: "23:59", values: ["11:00", "11:00", "10:30", "10:00", "09:30"] }
 ];
 
-// Tabulka „e“ - lokální čas
 const EXTENDED_TABLE = [
   { start: "19:00", end: "04:59", values: ["11:00", "11:00", "10:30", "10:00", "09:30"], overnight: true },
   { start: "05:00", end: "05:14", values: ["12:00", "12:00", "11:30", "11:00", "10:30"] },
@@ -110,7 +109,12 @@ function overlapMinutes(startA, endA, startB, endB) {
   return Math.max(0, end - start);
 }
 
-// Základ: počítá se jen denní část 07:00–23:00
+function calculateStandbyDurationFromStart(reportMinutes, sbyStartMinutes) {
+  let duration = reportMinutes - sbyStartMinutes;
+  if (duration < 0) duration += 1440;
+  return duration;
+}
+
 function calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes) {
   const standbyStart = reportMinutes - sbyMinutes;
   const standbyEnd = reportMinutes;
@@ -121,8 +125,8 @@ function calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes) {
 
   for (let day = firstDay; day <= lastDay; day++) {
     const dayOffset = day * 1440;
-    const countableStart = dayOffset + 7 * 60;   // 07:00
-    const countableEnd = dayOffset + 23 * 60;    // 23:00
+    const countableStart = dayOffset + 7 * 60;
+    const countableEnd = dayOffset + 23 * 60;
 
     countable += overlapMinutes(
       standbyStart,
@@ -135,8 +139,6 @@ function calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes) {
   return countable;
 }
 
-// Pokud call time padne do 23:00–07:00, interval callTime→reporting
-// se má celý počítat jako denní držení.
 function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMinutes) {
   const standbyStart = reportMinutes - sbyMinutes;
   const standbyEnd = reportMinutes;
@@ -153,10 +155,8 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMin
     return countable;
   }
 
-  // Najde správný absolutní výskyt call time uvnitř intervalu SBY
   const firstDay = Math.floor(standbyStart / 1440) - 1;
   const lastDay = Math.floor(standbyEnd / 1440) + 1;
-
   let effectiveCallAbsolute = null;
 
   for (let day = firstDay; day <= lastDay; day++) {
@@ -173,10 +173,9 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMin
 
   const intervalStart = effectiveCallAbsolute;
   const intervalEnd = standbyEnd;
-
   const totalCallToReport = Math.max(0, intervalEnd - intervalStart);
-  let alreadyCountedInCallToReport = 0;
 
+  let alreadyCountedInCallToReport = 0;
   const firstOverlapDay = Math.floor(intervalStart / 1440);
   const lastOverlapDay = Math.floor((intervalEnd - 1) / 1440);
 
@@ -194,7 +193,6 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMin
   }
 
   const extraNightMinutesToAdd = totalCallToReport - alreadyCountedInCallToReport;
-
   return countable + Math.max(0, extraNightMinutesToAdd);
 }
 
@@ -211,18 +209,22 @@ function formatUtcOffset(offset) {
 }
 
 function calculateResults() {
-  const report = toMinutes(document.getElementById("report").value);
+  const report = toMinutes(document.getElementById("report")?.value || "00:00");
 
-  const utcOffsetHours = parseInt(document.getElementById("utcOffsetHours").value, 10);
-  const utcOffsetHalf = parseInt(document.getElementById("utcOffsetHalf").value, 10);
-  const utcOffset = utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : utcOffsetHalf / 60);
+  const utcOffsetHours = parseInt(document.getElementById("utcOffsetHours")?.value ?? "1", 10);
+  const utcOffsetHalf = parseInt(document.getElementById("utcOffsetHalf")?.value ?? "0", 10);
+  const utcOffset =
+    utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : utcOffsetHalf / 60);
 
-  const sectors = parseInt(document.getElementById("sectors").value, 10);
+  const sectors = parseInt(document.getElementById("sectors")?.value ?? "1", 10);
   const hasSby = getSelectedHasSby();
-  const sby = hasSby ? toMinutes(document.getElementById("sby").value) : 0;
-  const sbyCallTime = hasSby ? toMinutes(document.getElementById("sbyCallTime").value) : null;
-  const lastLeg = toMinutes(document.getElementById("lastLeg").value);
-  const taxi = toMinutes(document.getElementById("taxi").value);
+
+  const sbyStart = hasSby ? toMinutes(document.getElementById("sbyStart")?.value || "00:00") : null;
+  const sby = hasSby ? calculateStandbyDurationFromStart(report, sbyStart) : 0;
+  const sbyCallTime = hasSby ? toMinutes(document.getElementById("sbyCallTime")?.value || "00:00") : null;
+
+  const lastLeg = toMinutes(document.getElementById("lastLeg")?.value || "00:00");
+  const taxi = toMinutes(document.getElementById("taxi")?.value || "00:00");
   const serviceType = getSelectedServiceType();
 
   const selectedTable = serviceType === "extended" ? EXTENDED_TABLE : BASE_TABLE;
@@ -265,6 +267,7 @@ function calculateResults() {
     report,
     sectors,
     hasSby,
+    sbyStart,
     sby,
     sbyCallTime,
     countableStandby,
@@ -300,9 +303,10 @@ function renderResults(result) {
     document.getElementById("latestDepartureUtc").textContent = "--:-- UTC";
     document.getElementById("latestDepartureCaptain").textContent = "--:-- local";
     document.getElementById("latestDepartureCaptainUtc").textContent = "--:-- UTC";
-
-    infoBox.className = "status bad";
-    infoBox.textContent = result.error;
+    if (infoBox) {
+      infoBox.className = "status bad";
+      infoBox.textContent = result.error;
+    }
     return;
   }
 
@@ -339,6 +343,7 @@ function renderResults(result) {
   }
 
   if (result.hasSby) {
+    infoText += ` SBY začala v ${minutesToTime(result.sbyStart)}.`;
     infoText += ` Celková SBY byla ${minutesToDuration(result.sby)}.`;
     infoText += ` Pro krácení se počítá ${minutesToDuration(result.countableStandby)}.`;
 
@@ -357,8 +362,10 @@ function renderResults(result) {
 
   infoText += ` Přepočet do UTC je udělaný s offsetem ${formatUtcOffset(result.utcOffset)}.`;
 
-  infoBox.className = "status good";
-  infoBox.textContent = infoText;
+  if (infoBox) {
+    infoBox.className = "status good";
+    infoBox.textContent = infoText;
+  }
 }
 
 function runCalculation() {
@@ -366,11 +373,9 @@ function runCalculation() {
   renderResults(result);
 }
 
-document.getElementById("calculateBtn").addEventListener("click", runCalculation);
-
+document.getElementById("calculateBtn")?.addEventListener("click", runCalculation);
 runCalculation();
 
-// PWA
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
