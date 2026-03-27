@@ -386,11 +386,33 @@
         </div>
       </div>
 
-      <div class="field">
-        <label for="sby">Doba držení SBY před reportingem</label>
-        <input type="time" id="sby" value="00:00" />
-        <div class="hint">Zkrácení FDP jen o část nad 06:00.</div>
-      </div>
+    <div class="field">
+  <label>Byl před reportingem SBY?</label>
+  <div class="segmented">
+    <div>
+      <input type="radio" id="sby-no" name="hasSby" value="no" checked />
+      <label for="sby-no">Ne</label>
+    </div>
+    <div>
+      <input type="radio" id="sby-yes" name="hasSby" value="yes" />
+      <label for="sby-yes">Ano</label>
+    </div>
+  </div>
+</div>
+
+<div class="field" id="sbyFields" style="display:none;">
+  <label for="sby">Doba držení SBY</label>
+  <input type="time" id="sby" value="00:00" />
+
+  <div style="height:10px;"></div>
+
+  <label for="sbyCallTime">Čas hovoru z plánování</label>
+  <input type="time" id="sbyCallTime" value="00:00" />
+
+  <div class="hint">
+    Pokud call time padne mezi 23:00–07:00, od tohoto času do reportingu se vše počítá jako denní držení.
+  </div>
+</div>
 
       <div class="field">
         <label for="lastLeg">Doba letu posledního sektoru</label>
@@ -449,7 +471,19 @@
       Tabulka se vyhodnocuje podle lokálního času reportingu. UTC se dopočítává jen pro přehled do kokpitu.
     </div>
   </section>
+<script>
+  function toggleSbyFields() {
+    const hasSby = document.querySelector('input[name="hasSby"]:checked')?.value;
+    document.getElementById("sbyFields").style.display = hasSby === "yes" ? "block" : "none";
+  }
 
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[name="hasSby"]').forEach(el => {
+      el.addEventListener("change", toggleSbyFields);
+    });
+    toggleSbyFields();
+  });
+</script>
   <script src="app.js"></script>
 </body>
 </html>
