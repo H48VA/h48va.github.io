@@ -2,55 +2,62 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kontrolní bod</title>
   <link rel="icon" href="/favicon.png">
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #eef3f5, #dfe8ec);
+      background: linear-gradient(180deg, #eef3f5 0%, #dfe8ec 100%);
       margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 16px;
       min-height: 100vh;
-      padding: 20px 0;
-      box-sizing: border-box;
+      color: #1f2d33;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
     }
 
     .card {
       background: white;
-      border-radius: 14px;
-      padding: 30px;
-      width: 90%;
-      max-width: 700px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      animation: fadeIn 0.5s ease;
-      box-sizing: border-box;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+      animation: fadeIn 0.4s ease;
     }
 
     h1 {
       color: #235c70;
-      margin-bottom: 5px;
+      margin: 0 0 10px 0;
+      font-size: 1.5rem;
+      line-height: 1.2;
     }
 
     p {
-      line-height: 1.5;
+      line-height: 1.55;
+      margin: 0 0 14px 0;
     }
 
-    .answer-box {
-      background: #f4f7f9;
-      padding: 14px;
-      border-radius: 10px;
-      margin-top: 15px;
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #235c70;
     }
 
     .audio-box {
       background: linear-gradient(135deg, #235c70, #2f748c);
       color: white;
       padding: 16px;
-      border-radius: 12px;
-      margin-top: 15px;
+      border-radius: 14px;
+      margin-top: 14px;
       box-shadow: 0 6px 18px rgba(35, 92, 112, 0.18);
     }
 
@@ -62,9 +69,9 @@
 
     .audio-subtitle {
       font-size: 0.92rem;
-      opacity: 0.95;
+      opacity: 0.96;
       margin-bottom: 14px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .audio-wrap {
@@ -80,64 +87,98 @@
       background: white;
     }
 
+    .answer-box {
+      background: #f4f7f9;
+      padding: 16px;
+      border-radius: 14px;
+      margin-top: 16px;
+    }
+
     .label {
       font-weight: bold;
       color: #235c70;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: block;
     }
 
-    .coord-line {
+    .coord-group {
+      display: grid;
+      gap: 12px;
+    }
+
+    .coord-row {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      row-gap: 12px;
-      font-size: 1.05em;
+      flex-wrap: nowrap;
+      gap: 6px;
     }
 
-    .coord-line span.fixed {
+    .fixed {
       font-weight: bold;
       color: #235c70;
+      flex: 0 0 auto;
     }
 
-    .coord-line input {
+    .coord-row input {
       border: 1px solid #c8d4da;
-      border-radius: 8px;
-      padding: 10px 8px;
-      font-size: 1em;
+      border-radius: 10px;
+      padding: 12px 8px;
+      font-size: 16px;
       text-align: center;
       background: white;
-      box-sizing: border-box;
+      min-height: 46px;
     }
 
     .deg {
-      width: 64px;
+      width: 56px;
     }
 
     .min-left {
-      width: 54px;
+      width: 52px;
     }
 
     .min-right {
       width: 64px;
     }
 
+    .preview {
+      margin-top: 14px;
+      padding: 12px;
+      background: #eef4f7;
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 0.96rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .small-note {
+      margin-top: 10px;
+      font-size: 0.92rem;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .small-note a {
+      color: #235c70;
+    }
+
     .buttons {
       margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
       gap: 10px;
     }
 
     button {
-      padding: 10px 14px;
-      border-radius: 8px;
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 10px;
       border: none;
       background: #235c70;
       color: white;
       cursor: pointer;
-      font-size: 0.95em;
+      font-size: 1rem;
+      font-weight: 600;
     }
 
     button:hover {
@@ -145,9 +186,10 @@
     }
 
     .result {
-      margin-top: 16px;
+      margin-top: 14px;
       font-weight: bold;
       min-height: 24px;
+      line-height: 1.4;
     }
 
     .ok {
@@ -158,148 +200,90 @@
       color: #b42318;
     }
 
-    .preview {
-      margin-top: 12px;
-      padding: 10px 12px;
-      background: #eef4f7;
-      border-radius: 8px;
-      font-family: monospace;
-      word-break: break-word;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .small-note {
-      margin-top: 10px;
-      font-size: 0.9em;
-      color: #666;
-      line-height: 1.5;
-    }
-
-    .small-note a {
-      color: #235c70;
-    }
-
-    @media (max-width: 600px) {
+    @media (min-width: 700px) {
       body {
-        padding: 12px 0;
-        align-items: flex-start;
+        padding: 28px;
       }
 
       .card {
-        width: calc(100% - 20px);
-        padding: 18px;
-        border-radius: 12px;
-      }
-
-      .audio-box {
-        padding: 14px;
-      }
-
-      .audio-title {
-        font-size: 0.98rem;
-      }
-
-      .audio-subtitle {
-        font-size: 0.88rem;
-      }
-
-      .coord-line {
-        gap: 6px;
-        row-gap: 10px;
-        font-size: 1em;
-      }
-
-      .coord-line input {
-        padding: 12px 8px;
-        font-size: 16px;
-      }
-
-      .deg {
-        width: 52px;
-      }
-
-      .min-left {
-        width: 46px;
-      }
-
-      .min-right {
-        width: 58px;
+        padding: 26px;
       }
 
       .buttons {
-        flex-direction: column;
+        grid-template-columns: 1fr 1fr;
       }
-
-      button {
-        width: 100%;
-        padding: 12px 14px;
-        font-size: 1rem;
-      }
-
-      .preview {
-        font-size: 0.95rem;
-        line-height: 1.4;
-      }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h1>Kontrolní bod č. 4</h1>
+  <div class="page">
+    <div class="card">
+      <h1>Kontrolní bod č. 4</h1>
 
-    <p>
-      Tady si sedl. Taková cesta po kalbě do práce není jen tak. Snad máte pěkně a je tady klid.
-      Budete se muset na chvíli zaposlouchat do líbezného zvuku.
-    </p>
+      <p>
+        Tady si sedl. Taková cesta po kalbě do práce není jen tak. Snad máte pěkně a je tady klid.
+        Budete se muset na chvíli zaposlouchat do líbezného zvuku.
+      </p>
 
-    <p><strong>Přesuňte se na souřadnice:</strong></p>
+      <p class="section-title">Přesuňte se na souřadnice:</p>
 
-    <div class="audio-box">
-          <div class="audio-wrap">
-        <audio controls preload="metadata">
-          <source src="morseovka.mp3" type="audio/mpeg">
-          Tvůj prohlížeč nepodporuje přehrávání audia.
-        </audio>
-      </div>
-    </div>
+      <div class="audio-box">
+        <div class="audio-title">Zvuková stopa</div>
+        <div class="audio-subtitle">
+          Pusťte si nahrávku a podle ní určete správné souřadnice.
+        </div>
 
-    <div class="answer-box">
-      <label class="label">Zadejte souřadnice:</label>
-
-      <div class="coord-line">
-        <span class="fixed">N</span>
-        <input id="nDeg" class="deg" type="text" inputmode="numeric" maxlength="2" placeholder="00">
-        <span class="fixed">°</span>
-
-        <input id="nMinA" class="min-left" type="text" inputmode="numeric" maxlength="2" placeholder="00">
-        <span class="fixed">.</span>
-        <input id="nMinB" class="min-right" type="text" inputmode="numeric" maxlength="3" placeholder="000">
-        <span class="fixed">′</span>
-
-        <span class="fixed">E</span>
-        <input id="eDeg" class="deg" type="text" inputmode="numeric" maxlength="2" placeholder="00">
-        <span class="fixed">°</span>
-
-        <input id="eMinA" class="min-left" type="text" inputmode="numeric" maxlength="2" placeholder="00">
-        <span class="fixed">.</span>
-        <input id="eMinB" class="min-right" type="text" inputmode="numeric" maxlength="3" placeholder="000">
-        <span class="fixed">′</span>
+        <div class="audio-wrap">
+          <audio controls preload="metadata">
+            <source src="morseovka.mp3" type="audio/mpeg">
+            Tvůj prohlížeč nepodporuje přehrávání audia.
+          </audio>
+        </div>
       </div>
 
-      <div class="preview" id="preview">N __° __.___′ E __° __.___′</div>
-      <div class="small-note">Pokud máte potíže s přehráním zvuku, klikněte <a href="https://youtu.be/h7fiDAR6C88" target="_blank" rel="noopener noreferrer">zde</a></div>
+      <div class="answer-box">
+        <label class="label">Zadejte souřadnice:</label>
 
-      <div class="buttons">
-        <button onclick="checkCoords()">Ověřit souřadnice</button>
-        <button onclick="copyFormattedCoords()">Kopírovat souřadnice</button>
+        <div class="coord-group">
+          <div class="coord-row">
+            <span class="fixed">N</span>
+            <input id="nDeg" class="deg" type="text" inputmode="numeric" maxlength="2" placeholder="00">
+            <span class="fixed">°</span>
+
+            <input id="nMinA" class="min-left" type="text" inputmode="numeric" maxlength="2" placeholder="00">
+            <span class="fixed">.</span>
+            <input id="nMinB" class="min-right" type="text" inputmode="numeric" maxlength="3" placeholder="000">
+            <span class="fixed">′</span>
+          </div>
+
+          <div class="coord-row">
+            <span class="fixed">E</span>
+            <input id="eDeg" class="deg" type="text" inputmode="numeric" maxlength="2" placeholder="00">
+            <span class="fixed">°</span>
+
+            <input id="eMinA" class="min-left" type="text" inputmode="numeric" maxlength="2" placeholder="00">
+            <span class="fixed">.</span>
+            <input id="eMinB" class="min-right" type="text" inputmode="numeric" maxlength="3" placeholder="000">
+            <span class="fixed">′</span>
+          </div>
+        </div>
+
+        <div class="preview" id="preview">N __° __.___′ E __° __.___′</div>
+        <div class="small-note">Pokud máte potíže s přehráním zvuku, klikněte <a href="https://youtu.be/h7fiDAR6C88" target="_blank" rel="noopener noreferrer">zde</a></div>
+
+        <div class="buttons">
+          <button onclick="checkCoords()">Ověřit souřadnice</button>
+          <button onclick="copyFormattedCoords()">Kopírovat souřadnice</button>
+        </div>
+
+        <div id="result" class="result"></div>
       </div>
-
-      <div id="result" class="result"></div>
     </div>
   </div>
 
@@ -342,15 +326,6 @@
       const showEMinB = eMinB || "___";
 
       return `N ${showNDeg}° ${showNMinA}.${showNMinB}′ E ${showEDeg}° ${showEMinA}.${showEMinB}′`;
-    }
-
-    function buildCanonicalCoords() {
-      const nDeg = cleanDigits(nDegInput.value);
-      const nMin = buildMinutes(nMinAInput.value, nMinBInput.value);
-      const eDeg = cleanDigits(eDegInput.value);
-      const eMin = buildMinutes(eMinAInput.value, eMinBInput.value);
-
-      return `N ${nDeg}° ${nMin}′ E ${eDeg}° ${eMin}′`;
     }
 
     function updatePreview() {
