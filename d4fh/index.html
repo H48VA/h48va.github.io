@@ -1,110 +1,323 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8">
-<title>Kontrolní bod</title>
+  <meta charset="UTF-8">
+  <title>Kontrolní bod</title>
+  <link rel="icon" href="/favicon.png">
 
-<!-- FAVICON (viz níže 👇) -->
-<link rel="icon" href="/favicon.png">
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #eef3f5, #dfe8ec);
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #eef3f5, #dfe8ec);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-.card {
-  background: white;
-  border-radius: 14px;
-  padding: 30px;
-  width: 90%;
-  max-width: 650px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  animation: fadeIn 0.5s ease;
-}
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 30px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      animation: fadeIn 0.5s ease;
+    }
 
-h1 {
-  color: #235c70;
-  margin-bottom: 5px;
-}
+    h1 {
+      color: #235c70;
+      margin-bottom: 5px;
+    }
 
-.stage {
-  font-size: 0.9em;
-  color: #777;
-  margin-bottom: 20px;
-}
+    p {
+      line-height: 1.5;
+    }
 
-.coords {
-  background: #f4f7f9;
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 15px;
-  font-weight: bold;
-}
+    .coords,
+    .answer-box {
+      background: #f4f7f9;
+      padding: 14px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
 
-button {
-  margin-top: 10px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  background: #235c70;
-  color: white;
-  cursor: pointer;
-}
+    .audio-wrap {
+      display: flex;
+      justify-content: center;
+    }
 
-button:hover {
-  opacity: 0.9;
-}
+    audio {
+      width: 100%;
+      max-width: 420px;
+    }
 
-.hint {
-  margin-top: 25px;
-  font-size: 0.95em;
-}
+    .label {
+      font-weight: bold;
+      color: #235c70;
+      margin-bottom: 10px;
+      display: block;
+    }
 
-a {
-  color: #235c70;
-}
+    .coord-line {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      row-gap: 12px;
+      font-size: 1.05em;
+    }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>
+    .coord-line span.fixed {
+      font-weight: bold;
+      color: #235c70;
+    }
 
+    .coord-line input {
+      border: 1px solid #c8d4da;
+      border-radius: 8px;
+      padding: 10px 8px;
+      font-size: 1em;
+      text-align: center;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    .deg {
+      width: 64px;
+    }
+
+    .min {
+      width: 92px;
+    }
+
+    .buttons {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      background: #235c70;
+      color: white;
+      cursor: pointer;
+      font-size: 0.95em;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .result {
+      margin-top: 16px;
+      font-weight: bold;
+      min-height: 24px;
+    }
+
+    .ok {
+      color: #1f7a3d;
+    }
+
+    .bad {
+      color: #b42318;
+    }
+
+    .preview {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #eef4f7;
+      border-radius: 8px;
+      font-family: monospace;
+      word-break: break-word;
+    }
+
+    .small-note {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
 
-<div class="card">
-  <h1>Kontrolní bod č. 4</h1>
+  <div class="card">
+    <h1>Kontrolní bod č. 4</h1>
 
-  <p>
-    Tady si sedl. Taková cesta po kalbě do práce není jen tak. Snad máte pěkně a je tady klid. Budete se muset na chvíli zaposlouchat do líbezného zvuku.
-  </p>
+    <p>
+      Tady si sedl. Taková cesta po kalbě do práce není jen tak. Snad máte pěkně a je tady klid.
+      Budete se muset na chvíli zaposlouchat do líbezného zvuku.
+    </p>
 
-  <p><strong>Přesuňte se na souřadnice:</strong></p>
+    <p><strong>Přesuňte se na souřadnice:</strong></p>
 
-<div class="coords" id="coords">
-  <audio controls>
-    <source src="morseovka.mp3" type="audio/mpeg">
-  </audio>
-</div>
+    <div class="coords">
+      <div class="audio-wrap">
+        <audio controls>
+          <source src="morseovka.mp3" type="audio/mpeg">
+          Tvůj prohlížeč nepodporuje přehrávání audia.
+        </audio>
+      </div>
+    </div>
 
-  <button onclick="copyCoords()">Kopírovat odkaz</button>
+    <div class="answer-box">
+      <label class="label">Zadejte souřadnice:</label>
 
-  
-</div>
+      <div class="coord-line">
+        <span class="fixed">N</span>
+        <input id="nDeg" class="deg" type="text" inputmode="numeric" maxlength="2" placeholder="49">
+        <span class="fixed">°</span>
 
-<script>
-function copyCoords() {
-  const text = document.getElementById("coords").innerText;
-  navigator.clipboard.writeText(text);
-  alert("Odkaz zkopírován");
-}
-</script>
+        <input id="nMin" class="min" type="text" inputmode="decimal" maxlength="6" placeholder="10.159">
+        <span class="fixed">′</span>
+
+        <span class="fixed">E</span>
+        <input id="eDeg" class="deg" type="text" inputmode="numeric" maxlength="2" placeholder="16">
+        <span class="fixed">°</span>
+
+        <input id="eMin" class="min" type="text" inputmode="decimal" maxlength="6" placeholder="37.312">
+        <span class="fixed">′</span>
+      </div>
+
+      <div class="preview" id="preview">N __° __.___′ E __° __.___′</div>
+      <div class="small-note">Tlačítko kopíruje celý řádek ve formátu výše.</div>
+
+      <div class="buttons">
+        <button onclick="checkCoords()">Ověřit souřadnice</button>
+        <button onclick="copyFormattedCoords()">Kopírovat text</button>
+      </div>
+
+      <div id="result" class="result"></div>
+    </div>
+  </div>
+
+  <script>
+    const correctHash = "76a71bf13a65eddf2e24d4539c83450144ba0e12d0b04b0f04f6470ee176bf4c";
+
+    const nDegInput = document.getElementById("nDeg");
+    const nMinInput = document.getElementById("nMin");
+    const eDegInput = document.getElementById("eDeg");
+    const eMinInput = document.getElementById("eMin");
+    const preview = document.getElementById("preview");
+    const result = document.getElementById("result");
+
+    function cleanDegree(value) {
+      return value.replace(/[^\d]/g, "");
+    }
+
+    function cleanMinutes(value) {
+      value = value.replace(/,/g, ".");
+      value = value.replace(/[^\d.]/g, "");
+
+      const firstDot = value.indexOf(".");
+      if (firstDot !== -1) {
+        value =
+          value.slice(0, firstDot + 1) +
+          value.slice(firstDot + 1).replace(/\./g, "");
+      }
+
+      return value;
+    }
+
+    function padMinutes(value) {
+      if (!value.includes(".")) return value;
+      const parts = value.split(".");
+      const whole = parts[0];
+      const decimals = (parts[1] || "").slice(0, 3);
+      return whole + "." + decimals;
+    }
+
+    function buildFormattedCoords() {
+      const nDeg = cleanDegree(nDegInput.value);
+      const nMin = padMinutes(cleanMinutes(nMinInput.value));
+      const eDeg = cleanDegree(eDegInput.value);
+      const eMin = padMinutes(cleanMinutes(eMinInput.value));
+
+      const showNDeg = nDeg || "__";
+      const showNMin = nMin || "__.___";
+      const showEDeg = eDeg || "__";
+      const showEMin = eMin || "__.___";
+
+      return `N ${showNDeg}° ${showNMin}′ E ${showEDeg}° ${showEMin}′`;
+    }
+
+    function buildCanonicalCoords() {
+      const nDeg = cleanDegree(nDegInput.value);
+      const nMin = padMinutes(cleanMinutes(nMinInput.value));
+      const eDeg = cleanDegree(eDegInput.value);
+      const eMin = padMinutes(cleanMinutes(eMinInput.value));
+
+      return `N ${nDeg}° ${nMin}′ E ${eDeg}° ${eMin}′`;
+    }
+
+    function updatePreview() {
+      preview.textContent = buildFormattedCoords();
+    }
+
+    [nDegInput, nMinInput, eDegInput, eMinInput].forEach(input => {
+      input.addEventListener("input", () => {
+        if (input === nDegInput || input === eDegInput) {
+          input.value = cleanDegree(input.value);
+        } else {
+          input.value = padMinutes(cleanMinutes(input.value));
+        }
+        updatePreview();
+      });
+    });
+
+    async function sha256(text) {
+      const data = new TextEncoder().encode(text);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function checkCoords() {
+      const nDeg = cleanDegree(nDegInput.value);
+      const nMin = padMinutes(cleanMinutes(nMinInput.value));
+      const eDeg = cleanDegree(eDegInput.value);
+      const eMin = padMinutes(cleanMinutes(eMinInput.value));
+
+      if (!nDeg || !nMin || !eDeg || !eMin) {
+        result.textContent = "Vyplňte prosím všechny části souřadnic.";
+        result.className = "result bad";
+        return;
+      }
+
+      const candidate = `N ${nDeg}° ${nMin}′ E ${eDeg}° ${eMin}′`;
+      const candidateHash = await sha256(candidate);
+
+      if (candidateHash === correctHash) {
+        result.textContent = "Správně, souřadnice sedí.";
+        result.className = "result ok";
+      } else {
+        result.textContent = "To není správně, zkuste to ještě jednou.";
+        result.className = "result bad";
+      }
+    }
+
+    async function copyFormattedCoords() {
+      const text = buildCanonicalCoords();
+
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Text zkopírován");
+      } catch (err) {
+        alert("Kopírování se nepovedlo.");
+      }
+    }
+
+    updatePreview();
+  </script>
 
 </body>
 </html>
