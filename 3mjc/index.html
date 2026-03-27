@@ -1,61 +1,93 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <title>Kontrolní bod</title>
-  <style>
-    body {
-      font-family: "Courier New", Courier, monospace;
-      background-color: #f4f7f9;
-      color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+<meta charset="UTF-8">
+<title>Kontrolní bod</title>
 
-    .box {
-      background: white;
-      border-radius: 10px;
-      padding: 30px;
-      max-width: 600px;
-      width: 90%;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    }
+<!-- FAVICON (viz níže 👇) -->
+<link rel="icon" href="/favicon.png">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #eef3f5, #dfe8ec);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    h1 {
-      color: #235c70;
-      margin-top: 0;
-    }
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 30px;
+  width: 90%;
+  max-width: 650px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  animation: fadeIn 0.5s ease;
+}
 
-    .hint {
-      margin-top: 20px;
-      font-size: 0.9em;
-    }
+h1 {
+  color: #235c70;
+  margin-bottom: 5px;
+}
 
-    a {
-      color: #235c70;
-    }
-  </style>
+.stage {
+  font-size: 0.9em;
+  color: #777;
+  margin-bottom: 20px;
+}
+
+.coords {
+  background: #f4f7f9;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #235c70;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.hint {
+  margin-top: 25px;
+  font-size: 0.95em;
+}
+
+a {
+  color: #235c70;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
 </head>
 <body>
 
-<div class="box">
+<div class="card">
   <h1>Kontrolní bod č. 3</h1>
 
-
   <p>
-Průser! Štefan přece pracuje na stavbě a všechny svoje ochranné pracovní pomůcky má doma. V práci by zas dostal bídu. Chtěl si proto nakoupit v tomto hobby marketu. Ale co že je to za den? 13.? No jo, mají tam havárii vody a zavřeno. Asi to bude muset risknout a doufat, že i jeho vedoucí bude nametenej a nevšimne si.
+    Průser! Štefan přece pracuje na stavbě a všechny svoje ochranné pracovní pomůcky má doma. V práci by zas dostal bídu. Chtěl si proto nakoupit v tomto hobby marketu. Ale co že je to za den? 13.? No jo, mají tam havárii vody a zavřeno. Asi to bude muset risknout a doufat, že i jeho vedoucí bude nametenej a nevšimne si.
 
   </p>
 
-  <p>
-    <strong>Přesuňte se na souřadnice, které jsou ukryty v okruhu 50 metrů.</strong><br>
-  </p>
+  <p><strong>Přesuňte se na souřadnice, které jsou ukryty v okruhu 50 metrů.</strong></p>
 
-
-</div>
 
 </body>
 </html>
