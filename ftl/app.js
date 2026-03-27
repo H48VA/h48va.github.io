@@ -46,8 +46,6 @@ const EXTENDED_TABLE = [
   { start: "18:30", end: "18:59", values: ["11:15", "11:15", "10:30", "10:00", "09:30"] }
 ];
 
-
-
 function toMinutes(timeString) {
   if (!timeString || !timeString.includes(":")) return 0;
   const [h, m] = timeString.split(":").map(Number);
@@ -73,14 +71,19 @@ function localToUtc(localMinutes, utcOffsetHours) {
   return localMinutes - utcOffsetHours * 60;
 }
 
-function getNowLocalMinutes() {
-  const now = new Date();
-  return now.getHours() * 60 + now.getMinutes();
-}
-
 function getSelectedServiceType() {
   const selected = document.querySelector('input[name="serviceType"]:checked');
   return selected ? selected.value : "normal";
+}
+
+function getSelectedHasSby() {
+  const selected = document.querySelector('input[name="hasSby"]:checked');
+  return selected ? selected.value === "yes" : false;
+}
+
+function isNightMinute(minuteOfDay) {
+  const normalized = ((minuteOfDay % 1440) + 1440) % 1440;
+  return normalized >= 1380 || normalized < 420; // 23:00–07:00
 }
 
 function isInRange(reportMinutes, startMinutes, endMinutes, overnight = false) {
@@ -140,13 +143,17 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMin
 
   let countable = calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes);
 
+  if (callTimeMinutes === null || callTimeMinutes === undefined) {
+    return countable;
+  }
+
   const normalizedCall = ((callTimeMinutes % 1440) + 1440) % 1440;
 
   if (!isNightMinute(normalizedCall)) {
     return countable;
   }
 
-  // najdeme správný výskyt call time uvnitř intervalu standbyStart→standbyEnd
+  // Najde správný absolutní výskyt call time uvnitř intervalu SBY
   const firstDay = Math.floor(standbyStart / 1440) - 1;
   const lastDay = Math.floor(standbyEnd / 1440) + 1;
 
@@ -167,8 +174,6 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMin
   const intervalStart = effectiveCallAbsolute;
   const intervalEnd = standbyEnd;
 
-  // základ už počítá jen 07–23; my potřebujeme dopočítat noční část
-  // od call time do reportingu, která by jinak započítaná nebyla
   const totalCallToReport = Math.max(0, intervalEnd - intervalStart);
   let alreadyCountedInCallToReport = 0;
 
@@ -196,32 +201,26 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMin
 function calculateStandbyReduction(countableStandby) {
   return Math.max(0, countableStandby - 360);
 }
-  return countable;
-}
 
-function calculateStandbyReduction(reportMinutes, sbyMinutes) {
-  const countableStandby = calculateCountableStandbyMinutes(reportMinutes, sbyMinutes);
-  return Math.max(0, countableStandby - 360);
-}
-
-function isNightMinute(minuteOfDay) {
-  const normalized = ((minuteOfDay % 1440) + 1440) % 1440;
-  return normalized >= 1380 || normalized < 420; // 23:00–07:00
-}
-
-function getSelectedHasSby() {
-  const selected = document.querySelector('input[name="hasSby"]:checked');
-  return selected ? selected.value === "yes" : false;
+function formatUtcOffset(offset) {
+  const sign = offset >= 0 ? "+" : "-";
+  const abs = Math.abs(offset);
+  const hours = Math.floor(abs);
+  const minutes = Math.round((abs - hours) * 60);
+  return `UTC${sign}${hours}:${String(minutes).padStart(2, "0")}`;
 }
 
 function calculateResults() {
   const report = toMinutes(document.getElementById("report").value);
-const utcOffsetHours = parseInt(document.getElementById("utcOffsetHours").value, 10);
-const utcOffsetHalf = parseInt(document.getElementById("utcOffsetHalf").value, 10);
-const utcOffset = utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : utcOffsetHalf / 60);  const sectors = parseInt(document.getElementById("sectors").value, 10);
- const hasSby = getSelectedHasSby();
-const sby = hasSby ? toMinutes(document.getElementById("sby").value) : 0;
-const sbyCallTime = hasSby ? toMinutes(document.getElementById("sbyCallTime").value) : null;
+
+  const utcOffsetHours = parseInt(document.getElementById("utcOffsetHours").value, 10);
+  const utcOffsetHalf = parseInt(document.getElementById("utcOffsetHalf").value, 10);
+  const utcOffset = utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : utcOffsetHalf / 60);
+
+  const sectors = parseInt(document.getElementById("sectors").value, 10);
+  const hasSby = getSelectedHasSby();
+  const sby = hasSby ? toMinutes(document.getElementById("sby").value) : 0;
+  const sbyCallTime = hasSby ? toMinutes(document.getElementById("sbyCallTime").value) : null;
   const lastLeg = toMinutes(document.getElementById("lastLeg").value);
   const taxi = toMinutes(document.getElementById("taxi").value);
   const serviceType = getSelectedServiceType();
@@ -239,11 +238,11 @@ const sbyCallTime = hasSby ? toMinutes(document.getElementById("sbyCallTime").va
   const captainExtraFromSelectedLimit = 120 - Math.max(0, plannedExtensionDifference);
   const captainExtraApplied = Math.max(0, captainExtraFromSelectedLimit);
 
- const countableStandby = hasSby
-  ? calculateCountableStandbyMinutes(report, sby, sbyCallTime)
-  : 0;
+  const countableStandby = hasSby
+    ? calculateCountableStandbyMinutes(report, sby, sbyCallTime)
+    : 0;
 
-const standbyReduction = calculateStandbyReduction(countableStandby);
+  const standbyReduction = calculateStandbyReduction(countableStandby);
 
   const maxFdp = selectedTableFdp - standbyReduction;
   const maxFdpCaptain = selectedTableFdp + captainExtraApplied - standbyReduction;
@@ -265,11 +264,11 @@ const standbyReduction = calculateStandbyReduction(countableStandby);
     utcOffset,
     report,
     sectors,
+    hasSby,
     sby,
+    sbyCallTime,
     countableStandby,
     standbyReduction,
-    hasSby,
-    sbyCallTime,
     lastLeg,
     taxi,
     baseTableFdp,
@@ -301,7 +300,6 @@ function renderResults(result) {
     document.getElementById("latestDepartureUtc").textContent = "--:-- UTC";
     document.getElementById("latestDepartureCaptain").textContent = "--:-- local";
     document.getElementById("latestDepartureCaptainUtc").textContent = "--:-- UTC";
-  
 
     infoBox.className = "status bad";
     infoBox.textContent = result.error;
@@ -330,6 +328,7 @@ function renderResults(result) {
     `${minutesToTime(result.latestDepartureCaptainUtc)} UTC`;
 
   let infoText = "";
+
   if (result.serviceType === "extended") {
     infoText =
       `Služba je počítaná z tabulky „e“. Oproti základní tabulce je plánované prodloužení ${minutesToDuration(result.plannedExtensionDifference)}. ` +
@@ -339,39 +338,28 @@ function renderResults(result) {
       `Služba je počítaná ze základní tabulky. Kapitánské prodloužení přidává ${minutesToDuration(result.captainExtraApplied)}.`;
   }
 
-if (result.hasSby) {
-  infoText += ` Celková SBY byla ${minutesToDuration(result.sby)}.`;
-  infoText += ` Pro krácení se počítá ${minutesToDuration(result.countableStandby)}.`;
+  if (result.hasSby) {
+    infoText += ` Celková SBY byla ${minutesToDuration(result.sby)}.`;
+    infoText += ` Pro krácení se počítá ${minutesToDuration(result.countableStandby)}.`;
 
-  if (result.sbyCallTime !== null && isNightMinute(result.sbyCallTime)) {
-    infoText += ` Call time ${minutesToTime(result.sbyCallTime)} spadl do 23:00–07:00, takže od call time do reportingu se vše počítá jako denní držení.`;
-  }
+    if (result.sbyCallTime !== null && isNightMinute(result.sbyCallTime)) {
+      infoText += ` Call time ${minutesToTime(result.sbyCallTime)} spadl do 23:00–07:00, takže od call time do reportingu se vše počítá jako denní držení.`;
+    }
 
-  if (result.standbyReduction > 0) {
-    infoText += ` SBY zkrátila duty o ${minutesToDuration(result.standbyReduction)}.`;
+    if (result.standbyReduction > 0) {
+      infoText += ` SBY zkrátila duty o ${minutesToDuration(result.standbyReduction)}.`;
+    } else {
+      infoText += ` SBY duty nezkrátila.`;
+    }
   } else {
-    infoText += ` SBY duty nezkrátila.`;
+    infoText += ` Před reportingem nebylo SBY.`;
   }
-} else {
-  infoText += ` Před reportingem nebylo SBY.`;
-}
 
-const offsetSign = result.utcOffset >= 0 ? "+" : "-";
-const offsetAbs = Math.abs(result.utcOffset);
-const offsetHoursPart = Math.floor(offsetAbs);
-const offsetMinutesPart = Math.round((offsetAbs - offsetHoursPart) * 60);
-const offsetFormatted = `UTC${offsetSign}${offsetHoursPart}:${String(offsetMinutesPart).padStart(2, "0")}`;
+  infoText += ` Přepočet do UTC je udělaný s offsetem ${formatUtcOffset(result.utcOffset)}.`;
 
-infoText += ` Přepočet do UTC je udělaný s offsetem ${offsetFormatted}.`;
   infoBox.className = "status good";
   infoBox.textContent = infoText;
-
-
 }
-
-
-
-
 
 function runCalculation() {
   const result = calculateResults();
@@ -379,8 +367,6 @@ function runCalculation() {
 }
 
 document.getElementById("calculateBtn").addEventListener("click", runCalculation);
-
-
 
 runCalculation();
 
