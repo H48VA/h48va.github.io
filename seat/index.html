@@ -2,193 +2,588 @@
 <html lang="cs">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>B738 Seat Map – clean version</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>B738 Seat Map – responsive + theme</title>
 <style>
-:root{--blue:#004289;--orange:#F28E00;--bg:#f7f9fc;--panel:#fff;--panel-soft:#f1f5f9;--line:#d9e2ec;--text:#1f2937;--muted:#64748b;--seat:#fff;--seat-selected:#dbeafe;--seat-marked:#fff7ed;--exit:#fff3df;--pill-blue:#e7f0fb;--pill-orange:#fff2df;--pill-purple:#f3e8ff;--shadow:0 8px 24px rgba(15,23,42,.08)}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
-.app{display:grid;grid-template-columns:360px 1fr;min-height:100vh}.sidebar{background:var(--panel);border-right:1px solid var(--line);padding:20px;position:sticky;top:0;height:100vh;overflow:auto}.main{padding:20px 20px 36px;overflow:auto}
-h1,h2,h3{margin:0 0 10px}h1{font-size:1.35rem;color:var(--blue)}h2{font-size:1rem}p,label,small{color:var(--muted)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:16px;margin-bottom:14px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-input,textarea,button{font:inherit}input[type=text],textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--text);outline:none}textarea{resize:vertical;min-height:90px}
-button{border:none;border-radius:12px;padding:10px 13px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer}.secondary{background:#e8eef5!important;color:var(--blue)!important}.warn{background:var(--orange)!important}.danger{background:#d92d20!important}.ghost{background:#fff!important;color:var(--blue)!important;border:1px solid var(--line)}
-.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.stat{background:var(--panel-soft);border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{display:block;font-size:1.2rem;color:var(--blue)}
-.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.legend-item{display:flex;gap:8px;align-items:center;font-size:.92rem}.swatch{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.08)}.list{max-height:260px;overflow:auto}.list-item{padding:10px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
-.seatmap-wrap{max-width:1260px;margin:0 auto}.topbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:16px}.seatmap{background:var(--panel);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:20px 16px 28px}.aircraft-head,.aircraft-tail{text-align:center;color:var(--blue);font-size:.85rem;letter-spacing:.18em;margin:6px 0 14px;font-weight:800}
-.grid-header,.seat-row{display:grid;grid-template-columns:42px repeat(3,1fr) 30px repeat(3,1fr);gap:8px;align-items:center}.grid-header{position:sticky;top:0;padding:8px 0;background:rgba(247,249,252,.96);z-index:2;color:var(--muted);font-weight:700}.seat-row{padding:6px 0;border-bottom:1px dashed #e7edf3}.seat-row.exit-row{background:linear-gradient(90deg,transparent,rgba(242,142,0,.1),transparent);border-radius:14px}.rownum{text-align:center;font-weight:800;color:var(--blue)}.aisle{text-align:center;color:#b0b9c7;font-size:.8rem}
-.seat{min-height:82px;border-radius:16px;border:1px solid var(--line);background:var(--seat);padding:8px;text-align:left;cursor:pointer}.seat.exit{background:var(--exit)}.seat.selected{outline:3px solid rgba(0,66,137,.22);background:var(--seat-selected)}.seat.has-data{box-shadow:inset 0 0 0 2px rgba(242,142,0,.18);background:var(--seat-marked)}.seat-id{font-weight:800;color:var(--blue);margin-bottom:5px}.seat-meta{display:flex;flex-direction:column;gap:4px;font-size:.7rem}
-.pill{display:inline-flex;align-items:center;width:max-content;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:3px 8px;border-radius:999px;font-weight:700}.pill-catering{background:var(--pill-blue);color:var(--blue)}.pill-pax{background:var(--pill-purple);color:#7c3aed}.pill-fresh{background:var(--pill-orange);color:#b86000}.pill-note{background:#eef2f6;color:#4b5563}
-.muted{color:var(--muted)}.modal{position:fixed;inset:0;background:rgba(15,23,42,.28);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}.modal.open{display:flex}.modal-box{width:min(1040px,100%);max-height:92vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 50px rgba(15,23,42,.15);padding:18px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.section-title{font-size:.96rem;font-weight:800;color:var(--blue);margin:0 0 8px}
-.check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff}.product-name{font-weight:800;color:var(--blue);margin-bottom:8px}.qty{display:flex;align-items:center;justify-content:space-between;gap:8px}.qty-controls{display:flex;align-items:center;gap:8px}.qty-btn{width:34px;height:34px;border-radius:10px;background:var(--panel-soft);color:var(--blue);border:1px solid var(--line);font-weight:800}.qty-number{min-width:24px;text-align:center;font-weight:800}.cart{margin-top:10px;background:var(--panel-soft);border:1px dashed #cfd9e4;border-radius:14px;padding:12px;min-height:58px}.code-help{margin-top:10px;font-size:.88rem;color:var(--muted);background:#f8fafc;border:1px dashed var(--line);padding:10px;border-radius:12px}
-@media (max-width:1080px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}}
-@media (max-width:820px){.modal-grid{grid-template-columns:1fr}.products,.legend-grid,.summary{grid-template-columns:1fr}.grid-header,.seat-row{grid-template-columns:34px repeat(3,1fr) 18px repeat(3,1fr);gap:5px}.seat{min-height:68px;padding:6px}}
+:root{
+  --blue:#004289;
+  --orange:#F28E00;
+
+  --bg:#f6f8fb;
+  --bg2:#eef3f8;
+  --panel:#ffffff;
+  --panel-soft:#f4f7fb;
+  --line:#d8e1eb;
+  --text:#1f2937;
+  --muted:#64748b;
+  --seat:#ffffff;
+  --seat-selected:#dbeafe;
+  --seat-marked:#fff7ed;
+  --exit:#fff3df;
+  --pill-blue:#e7f0fb;
+  --pill-orange:#fff2df;
+  --pill-purple:#f3e8ff;
+  --shadow:0 8px 24px rgba(15,23,42,.08);
+}
+body.dark{
+  --bg:#0f172a;
+  --bg2:#111827;
+  --panel:#162033;
+  --panel-soft:#1c2840;
+  --line:#2e3a52;
+  --text:#e5e7eb;
+  --muted:#a8b3c7;
+  --seat:#1a2740;
+  --seat-selected:#203c68;
+  --seat-marked:#3c2b12;
+  --exit:#352611;
+  --pill-blue:#1f3e67;
+  --pill-orange:#4a3311;
+  --pill-purple:#3a2757;
+  --shadow:0 12px 30px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:linear-gradient(180deg,var(--bg),var(--bg2));
+}
+.app{
+  display:grid;
+  grid-template-columns:340px 1fr;
+  min-height:100vh;
+}
+.sidebar{
+  background:var(--panel);
+  border-right:1px solid var(--line);
+  padding:16px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+}
+.main{
+  padding:16px;
+  overflow:auto;
+}
+h1,h2,h3{margin:0 0 10px}
+h1{font-size:1.3rem;color:var(--blue)}
+h2{font-size:1rem}
+p,label,small{color:var(--muted)}
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  padding:14px;
+  margin-bottom:12px;
+}
+.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.space-between{justify-content:space-between}
+input,textarea,button{
+  font:inherit;
+}
+input[type=text],textarea{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  background:var(--panel);
+  color:var(--text);
+  outline:none;
+}
+textarea{resize:vertical;min-height:84px}
+button{
+  border:none;
+  border-radius:12px;
+  padding:10px 12px;
+  background:var(--blue);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+button.secondary{background:var(--panel-soft);color:var(--blue);border:1px solid var(--line)}
+button.warn{background:var(--orange)}
+button.danger{background:#d92d20}
+button.ghost{background:transparent;color:var(--blue);border:1px solid var(--line)}
+button.small{padding:8px 10px;font-size:.9rem}
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.stat{
+  background:var(--panel-soft);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px;
+}
+.stat b{display:block;font-size:1.15rem;color:var(--blue)}
+.legend-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.legend-item{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  font-size:.9rem;
+}
+.swatch{
+  width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.08);flex:0 0 14px
+}
+.list{
+  max-height:220px;
+  overflow:auto;
+}
+.list-item{
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  margin-bottom:8px;
+  background:var(--panel);
+}
+.seatmap-wrap{
+  max-width:1240px;
+  margin:0 auto;
+}
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+.seatmap{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:26px;
+  box-shadow:var(--shadow);
+  padding:16px 12px 22px;
+  overflow:hidden;
+}
+.aircraft-head,.aircraft-tail{
+  text-align:center;
+  color:var(--blue);
+  font-size:.82rem;
+  letter-spacing:.18em;
+  margin:4px 0 12px;
+  font-weight:800;
+}
+.grid-header,.seat-row{
+  display:grid;
+  grid-template-columns:36px repeat(3,1fr) 24px repeat(3,1fr);
+  gap:6px;
+  align-items:center;
+}
+.grid-header{
+  position:sticky;
+  top:0;
+  padding:8px 0;
+  background:color-mix(in srgb, var(--bg) 90%, transparent);
+  z-index:2;
+  color:var(--muted);
+  font-weight:700;
+  text-align:center;
+}
+.rownum{
+  text-align:center;
+  font-weight:800;
+  color:var(--blue);
+  font-size:.9rem;
+}
+.seat-row{
+  padding:4px 0;
+  border-bottom:1px dashed color-mix(in srgb, var(--line) 75%, transparent);
+}
+.seat-row.exit-row{
+  background:linear-gradient(90deg,transparent,color-mix(in srgb, var(--orange) 10%, transparent),transparent);
+  border-radius:12px;
+}
+.aisle{
+  text-align:center;
+  color:var(--muted);
+  font-size:.72rem;
+}
+.seat{
+  min-height:58px;
+  max-height:58px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:var(--seat);
+  padding:6px 6px 5px;
+  text-align:left;
+  cursor:pointer;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.seat.exit{background:var(--exit)}
+.seat.selected{
+  outline:2px solid color-mix(in srgb, var(--blue) 28%, transparent);
+  background:var(--seat-selected);
+}
+.seat.has-data{
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--orange) 35%, transparent);
+  background:var(--seat-marked);
+}
+.seat-id{
+  font-weight:800;
+  color:var(--blue);
+  font-size:.85rem;
+  line-height:1.1;
+  margin-bottom:4px;
+}
+.seat-meta{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  font-size:.63rem;
+  line-height:1.1;
+  overflow:hidden;
+}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  padding:2px 6px;
+  border-radius:999px;
+  font-weight:700;
+}
+.pill-catering{background:var(--pill-blue);color:var(--blue)}
+.pill-pax{background:var(--pill-purple);color:#8b5cf6}
+.pill-fresh{background:var(--pill-orange);color:var(--orange)}
+.pill-note{background:var(--panel-soft);color:var(--muted)}
+.muted{color:var(--muted)}
+.modal{
+  position:fixed; inset:0;
+  background:rgba(15,23,42,.32);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+  z-index:50;
+}
+.modal.open{display:flex}
+.modal-box{
+  width:min(980px,100%);
+  max-height:92vh;
+  overflow:auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:0 18px 50px rgba(15,23,42,.18);
+  padding:16px;
+}
+.modal-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.section-title{
+  font-size:.95rem;
+  font-weight:800;
+  color:var(--blue);
+  margin:0 0 8px;
+}
+.check-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 12px;
+}
+.products{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.product{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:8px 10px;
+  background:var(--panel);
+}
+.product-name{
+  font-weight:800;
+  color:var(--blue);
+  margin-bottom:6px;
+  font-size:.92rem;
+}
+.qty{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.qty-controls{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.qty-btn{
+  width:28px;height:28px;
+  border-radius:8px;
+  background:var(--panel-soft);
+  color:var(--blue);
+  border:1px solid var(--line);
+  font-weight:800;
+  padding:0;
+}
+.qty-number{
+  min-width:18px;
+  text-align:center;
+  font-weight:800;
+  font-size:.9rem;
+}
+.cart{
+  margin-top:8px;
+  background:var(--panel-soft);
+  border:1px dashed var(--line);
+  border-radius:12px;
+  padding:10px;
+  min-height:48px;
+}
+.code-help{
+  margin-top:10px;
+  font-size:.88rem;
+  color:var(--muted);
+  background:var(--panel-soft);
+  border:1px dashed var(--line);
+  padding:10px;
+  border-radius:12px;
+}
+.sticky-actions{
+  position:sticky;
+  bottom:0;
+  background:linear-gradient(180deg,transparent,var(--panel) 22%);
+  padding-top:10px;
+}
+@media (max-width:1100px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto}
+}
+@media (max-width:820px){
+  .main,.sidebar{padding:12px}
+  .summary,.legend-grid,.products{grid-template-columns:1fr}
+  .modal-grid{grid-template-columns:1fr}
+  .check-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  h1{font-size:1.15rem}
+  .topbar{margin-bottom:10px}
+  .seatmap{padding:12px 8px 16px;border-radius:18px}
+  .grid-header,.seat-row{
+    grid-template-columns:28px repeat(3,minmax(0,1fr)) 14px repeat(3,minmax(0,1fr));
+    gap:4px;
+  }
+  .grid-header{font-size:.72rem}
+  .rownum{font-size:.78rem}
+  .seat{
+    min-height:48px;
+    max-height:48px;
+    border-radius:10px;
+    padding:4px 4px 3px;
+  }
+  .seat-id{font-size:.72rem;margin-bottom:2px}
+  .seat-meta{font-size:.53rem;gap:2px}
+  .pill{padding:1px 4px}
+  .aisle{font-size:.6rem}
+  .card{padding:12px;border-radius:14px}
+  .modal-box{padding:12px;border-radius:18px}
+  .product{padding:8px}
+  .product-name{font-size:.86rem}
+  .qty-btn{width:26px;height:26px}
+  .check-grid{grid-template-columns:1fr}
+  button{padding:9px 10px}
+}
 </style>
 </head>
 <body>
 <div class="app">
-<aside class="sidebar">
-<h1>B738 seat map</h1>
-<p>Čistá verze bez dark modu. Klikni na sedačku a doplň extra catering, special PAX a fresh produkty.</p>
+  <aside class="sidebar">
+    <h1>B738 seat map</h1>
+    <p>Responzivní verze s přepínáním motivu. Klikni na sedačku a doplň extra catering, special PAX a fresh produkty.</p>
 
-<div class="card">
-<h2>Let / poznámka</h2>
-<label for="flightNo">Číslo letu / routing</label>
-<input id="flightNo" type="text" placeholder="QS1234 PRG–PMI" />
-<div style="height:8px"></div>
-<label for="generalNote">Obecná poznámka</label>
-<textarea id="generalNote" placeholder="Např. 2× WCHR, 1× UMNR, turbulence, full flight..."></textarea>
-</div>
+    <div class="card">
+      <h2>Let / poznámka</h2>
+      <label for="flightNo">Číslo letu / routing</label>
+      <input id="flightNo" type="text" placeholder="QS1234 PRG–PMI" />
+      <div style="height:8px"></div>
+      <label for="generalNote">Obecná poznámka</label>
+      <textarea id="generalNote" placeholder="Např. 2× WCHR, 1× UMNR, turbulence, full flight..."></textarea>
+    </div>
 
-<div class="card">
-<h2>Souhrn</h2>
-<div class="summary">
-<div class="stat"><span class="muted">Sedačky s daty</span><b id="countSeats">0</b></div>
-<div class="stat"><span class="muted">Extra catering</span><b id="countCatering">0</b></div>
-<div class="stat"><span class="muted">Fresh kusy</span><b id="countFresh">0</b></div>
-</div>
-</div>
+    <div class="card">
+      <div class="row space-between">
+        <h2>Vzhled</h2>
+        <button id="themeBtn" class="secondary small">Dark mode</button>
+      </div>
+      <div class="muted" id="themeLabel">Aktuálně: světlý režim</div>
+    </div>
 
-<div class="card">
-<h2>Legenda</h2>
-<div class="legend-grid">
-<div class="legend-item"><span class="swatch" style="background:#fff"></span> běžná sedačka</div>
-<div class="legend-item"><span class="swatch" style="background:#fff3df"></span> exit row</div>
-<div class="legend-item"><span class="swatch" style="background:#dbeafe"></span> vybraná sedačka</div>
-<div class="legend-item"><span class="swatch" style="background:#e7f0fb"></span> extra catering</div>
-<div class="legend-item"><span class="swatch" style="background:#f3e8ff"></span> special PAX</div>
-<div class="legend-item"><span class="swatch" style="background:#fff2df"></span> fresh produkty</div>
-</div>
-<div style="height:12px"></div>
-<h2>Legenda pro extra catering</h2>
-<div class="code-help">
-<div><strong>SLML</strong> – Řízky vepřové velké</div>
-<div><strong>SMML</strong> – Řízky vepřové malé</div>
-<div><strong>SNML</strong> – Řízky kuřecí velké</div>
-<div><strong>SOML</strong> – Řízky kuřecí malé</div>
-</div>
-</div>
+    <div class="card">
+      <h2>Souhrn</h2>
+      <div class="summary">
+        <div class="stat"><span class="muted">Sedačky s daty</span><b id="countSeats">0</b></div>
+        <div class="stat"><span class="muted">Extra catering</span><b id="countCatering">0</b></div>
+        <div class="stat"><span class="muted">Fresh kusy</span><b id="countFresh">0</b></div>
+      </div>
+    </div>
 
-<div class="card">
-<h2>Special PAX přehled</h2>
-<div class="list" id="specialPaxList"></div>
-</div>
+    <div class="card">
+      <h2>Legenda</h2>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="swatch" style="background:var(--seat)"></span> běžná sedačka</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--exit)"></span> exit row</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--seat-selected)"></span> vybraná sedačka</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--pill-blue)"></span> extra catering</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--pill-purple)"></span> special PAX</div>
+        <div class="legend-item"><span class="swatch" style="background:var(--pill-orange)"></span> fresh produkty</div>
+      </div>
 
-<div class="card">
-<h2>Fresh přehled</h2>
-<div class="list" id="freshList"></div>
-</div>
+      <div style="height:12px"></div>
+      <h2>Legenda pro extra catering</h2>
+      <div class="code-help">
+        <div><strong>SLML</strong> – Řízky vepřové velké</div>
+        <div><strong>SMML</strong> – Řízky vepřové malé</div>
+        <div><strong>SNML</strong> – Řízky kuřecí velké</div>
+        <div><strong>SOML</strong> – Řízky kuřecí malé</div>
+      </div>
+    </div>
 
-<div class="card">
-<div class="row">
-<button id="rotateBtn" class="warn">Otočit mapu</button>
-<button id="findBtn" class="ghost">Najít sedačku</button>
-</div>
-<div style="height:8px"></div>
-<input id="searchSeat" type="text" placeholder="Např. 17C" />
-<div style="height:10px"></div>
-<div class="row">
-<button id="exportBtn">Export JSON</button>
-<button id="importBtn" class="secondary">Import JSON</button>
-</div>
-<div style="height:8px"></div>
-<div class="row">
-<button id="sampleBtn" class="secondary">Ukázková data</button>
-<button id="clearBtn" class="danger">Vymazat vše</button>
-</div>
-<input type="file" id="importFile" accept=".json" style="display:none" />
-<div class="muted" style="margin-top:10px">Data se ukládají automaticky do prohlížeče.</div>
-</div>
-</aside>
+    <div class="card">
+      <h2>Special PAX přehled</h2>
+      <div class="list" id="specialPaxList"></div>
+    </div>
 
-<main class="main">
-<div class="seatmap-wrap">
-<div class="topbar">
-<div>
-<h2 style="font-size:1.25rem;color:var(--blue)">Boeing 737-800</h2>
-<p>Řady 1–34, bez řad 15 a 16. Nouzové východy na 17 a 18.</p>
-</div>
-<div class="row">
-<div class="muted">Směr mapy:</div>
-<strong id="orientationLabel" style="color:var(--orange)">1 → 34</strong>
-</div>
-</div>
+    <div class="card">
+      <h2>Fresh přehled</h2>
+      <div class="list" id="freshList"></div>
+    </div>
 
-<section class="seatmap">
-<div id="noseLabel" class="aircraft-head">NOSE / ROW 1</div>
-<div class="grid-header">
-<div></div><div>A</div><div>B</div><div>C</div><div></div><div>D</div><div>E</div><div>F</div>
-</div>
-<div id="seatRows"></div>
-<div id="tailLabel" class="aircraft-tail">TAIL / ROW 34</div>
-</section>
-</div>
-</main>
+    <div class="card">
+      <div class="row">
+        <button id="rotateBtn" class="warn">Otočit mapu</button>
+        <button id="findBtn" class="ghost">Najít sedačku</button>
+      </div>
+      <div style="height:8px"></div>
+      <input id="searchSeat" type="text" placeholder="Např. 17C" />
+      <div style="height:10px"></div>
+      <div class="row">
+        <button id="exportBtn">Export JSON</button>
+        <button id="importBtn" class="secondary">Import JSON</button>
+      </div>
+      <div style="height:8px"></div>
+      <div class="row">
+        <button id="sampleBtn" class="secondary">Ukázková data</button>
+        <button id="clearBtn" class="danger">Vymazat vše</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" />
+      <div class="muted" style="margin-top:10px">Data se ukládají automaticky do prohlížeče.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="seatmap-wrap">
+      <div class="topbar">
+        <div>
+          <h2 style="font-size:1.25rem;color:var(--blue)">Boeing 737-800</h2>
+          <p>Řady 1–34, bez řad 15 a 16. Nouzové východy na 17 a 18.</p>
+        </div>
+        <div class="row">
+          <div class="muted">Směr mapy:</div>
+          <strong id="orientationLabel" style="color:var(--orange)">1 → 34</strong>
+        </div>
+      </div>
+
+      <section class="seatmap">
+        <div id="noseLabel" class="aircraft-head">NOSE / ROW 1</div>
+        <div class="grid-header" id="gridHeader"></div>
+        <div id="seatRows"></div>
+        <div id="tailLabel" class="aircraft-tail">TAIL / ROW 34</div>
+      </section>
+    </div>
+  </main>
 </div>
 
 <div class="modal" id="seatModal">
-<div class="modal-box">
-<div class="row" style="justify-content:space-between;margin-bottom:12px;">
-<div>
-<h2 id="modalTitle" style="color:var(--blue)">Sedačka</h2>
-<small>Kombinuj extra catering, special PAX a fresh produkty.</small>
-</div>
-<button id="closeModal" class="secondary">Zavřít</button>
-</div>
+  <div class="modal-box">
+    <div class="row space-between" style="margin-bottom:12px;">
+      <div>
+        <h2 id="modalTitle" style="color:var(--blue)">Sedačka</h2>
+        <small>Kombinuj extra catering, special PAX a fresh produkty.</small>
+      </div>
+      <button id="closeModal" class="secondary">Zavřít</button>
+    </div>
 
-<div class="modal-grid">
-<div>
-<div class="section-title">Extra catering</div>
-<div class="products" id="cateringProducts"></div>
-<div class="cart" id="cateringCart"></div>
-<div style="height:10px"></div>
-<label for="customCatering">Vlastní extra catering</label>
-<input id="customCatering" type="text" placeholder="Např. vlastní kód nebo poznámka" />
+    <div class="modal-grid">
+      <div>
+        <div class="section-title">Extra catering</div>
+        <div class="products" id="cateringProducts"></div>
+        <div class="cart" id="cateringCart"></div>
+        <div style="height:10px"></div>
+        <label for="customCatering">Vlastní extra catering</label>
+        <input id="customCatering" type="text" placeholder="Např. vlastní kód nebo poznámka" />
 
-<div style="height:16px"></div>
-<div class="section-title">Special PAX</div>
-<div class="check-grid" id="specialPaxChecks">
-<label><input type="checkbox" value="WCHR" /> WCHR</label>
-<label><input type="checkbox" value="WCHS" /> WCHS</label>
-<label><input type="checkbox" value="WCHC" /> WCHC</label>
-<label><input type="checkbox" value="INF" /> INF</label>
-<label><input type="checkbox" value="UMNR" /> UMNR</label>
-<label><input type="checkbox" value="DEAF" /> DEAF</label>
-<label><input type="checkbox" value="BLND" /> BLND</label>
-<label><input type="checkbox" value="EXST" /> EXST</label>
-<label><input type="checkbox" value="MAAS" /> MAAS</label>
-<label><input type="checkbox" value="PETC" /> PETC</label>
-</div>
-<div style="height:8px"></div>
-<label for="customPax">Vlastní kód / poznámka k PAX</label>
-<input id="customPax" type="text" placeholder="Např. MEDA, DPNA, VIP..." />
-</div>
+        <div style="height:16px"></div>
 
-<div>
-<div class="section-title">Fresh produkty</div>
-<div class="products" id="freshProducts"></div>
-<div class="cart" id="freshCart"></div>
+        <div class="section-title">Special PAX</div>
+        <div class="check-grid" id="specialPaxChecks">
+          <label><input type="checkbox" value="WCHR" /> WCHR</label>
+          <label><input type="checkbox" value="WCHS" /> WCHS</label>
+          <label><input type="checkbox" value="WCHC" /> WCHC</label>
+          <label><input type="checkbox" value="INF" /> INF</label>
+          <label><input type="checkbox" value="UMNR" /> UMNR</label>
+          <label><input type="checkbox" value="DEAF" /> DEAF</label>
+          <label><input type="checkbox" value="BLND" /> BLND</label>
+          <label><input type="checkbox" value="EXST" /> EXST</label>
+          <label><input type="checkbox" value="MAAS" /> MAAS</label>
+          <label><input type="checkbox" value="PETC" /> PETC</label>
+        </div>
+        <div style="height:8px"></div>
+        <label for="customPax">Vlastní kód / poznámka k PAX</label>
+        <input id="customPax" type="text" placeholder="Např. MEDA, DPNA, VIP..." />
+      </div>
 
-<div style="height:16px"></div>
-<label for="seatNote">Poznámka k sedačce</label>
-<textarea id="seatNote" placeholder="Např. donést po první trolley service nebo přinést vše najednou"></textarea>
-</div>
-</div>
+      <div>
+        <div class="section-title">Fresh produkty</div>
+        <div class="products" id="freshProducts"></div>
+        <div class="cart" id="freshCart"></div>
 
-<div class="row" style="justify-content:space-between;margin-top:16px;">
-<button id="deleteSeatData" class="danger">Smazat data sedačky</button>
-<button id="saveSeatData">Uložit</button>
-</div>
-</div>
+        <div style="height:16px"></div>
+        <label for="seatNote">Poznámka k sedačce</label>
+        <textarea id="seatNote" placeholder="Např. donést po první trolley service nebo přinést vše najednou"></textarea>
+      </div>
+    </div>
+
+    <div class="sticky-actions">
+      <div class="row space-between">
+        <button id="deleteSeatData" class="danger">Smazat data sedačky</button>
+        <button id="saveSeatData">Uložit</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 const ALL_ROWS = Array.from({length:34}, (_,i)=>i+1).filter(r => ![15,16].includes(r));
 const EXIT_ROWS = [17,18];
-const STORAGE_KEY = 'b738-seatmap-clean-v2';
+const STORAGE_KEY = 'b738-seatmap-clean-v3';
 const FRESH_PRODUCTS = ['PŠ', 'PV', 'Croque', 'Bloomer', 'Párek', 'Pasta', 'Pork', 'Bageta'];
 const CATERING_PRODUCTS = ['SLML', 'SMML', 'SNML', 'SOML', 'SYML', 'SZML'];
 
-let state = { flightNo:'', generalNote:'', reverse:false, seats:{} };
+let state = { flightNo:'', generalNote:'', reverse:false, dark:false, seats:{} };
 let currentSeat = null;
 let modalFresh = {};
 let modalCatering = {};
@@ -207,11 +602,29 @@ function summarizeCounts(obj){
 function shorten(text, max){ text = String(text || ''); return text.length > max ? text.slice(0, max - 1) + '…' : text; }
 function escapeHtml(str){ return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
 
+function lettersOrder(){
+  return state.reverse ? ['F','E','D','C','B','A'] : ['A','B','C','D','E','F'];
+}
+function leftLetters(){
+  return state.reverse ? ['F','E','D'] : ['A','B','C'];
+}
+function rightLetters(){
+  return state.reverse ? ['C','B','A'] : ['D','E','F'];
+}
+
+function renderHeader(){
+  const h = document.getElementById('gridHeader');
+  const order = lettersOrder();
+  h.innerHTML = `<div></div><div>${order[0]}</div><div>${order[1]}</div><div>${order[2]}</div><div></div><div>${order[3]}</div><div>${order[4]}</div><div>${order[5]}</div>`;
+}
+
 function renderSeatMap(){
   const container = document.getElementById('seatRows');
   container.innerHTML = '';
   const rows = state.reverse ? [...ALL_ROWS].reverse() : ALL_ROWS;
-  document.getElementById('orientationLabel').textContent = state.reverse ? '34 → 1' : '1 → 34';
+  renderHeader();
+
+  document.getElementById('orientationLabel').textContent = state.reverse ? '34 → 1 / FED CBA' : '1 → 34 / ABC DEF';
   document.getElementById('noseLabel').textContent = state.reverse ? 'NOSE / ROW 34' : 'NOSE / ROW 1';
   document.getElementById('tailLabel').textContent = state.reverse ? 'TAIL / ROW 1' : 'TAIL / ROW 34';
 
@@ -224,12 +637,14 @@ function renderSeatMap(){
     rowNum.textContent = row;
     rowEl.appendChild(rowNum);
 
-    ['A','B','C'].forEach(letter => rowEl.appendChild(makeSeat(row, letter)));
+    leftLetters().forEach(letter => rowEl.appendChild(makeSeat(row, letter)));
+
     const aisle = document.createElement('div');
     aisle.className = 'aisle';
     aisle.textContent = '✈';
     rowEl.appendChild(aisle);
-    ['D','E','F'].forEach(letter => rowEl.appendChild(makeSeat(row, letter)));
+
+    rightLetters().forEach(letter => rowEl.appendChild(makeSeat(row, letter)));
     container.appendChild(rowEl);
   }
 }
@@ -246,17 +661,17 @@ function makeSeat(row, letter){
   const cateringSummary = summarizeCounts(data.extraCatering);
   if(cateringSummary || (data.customCatering || '').trim()){
     const txt = [cateringSummary, (data.customCatering || '').trim()].filter(Boolean).join('; ');
-    html += `<span class="pill pill-catering">${escapeHtml(shorten(txt, 26))}</span>`;
+    html += `<span class="pill pill-catering">${escapeHtml(shorten(txt, 14))}</span>`;
   }
   if((data.specialPax || []).length || (data.customPax || '').trim()){
     const txt = [...(data.specialPax || []), ...(((data.customPax || '').trim()) ? [(data.customPax || '').trim()] : [])].join(', ');
-    html += `<span class="pill pill-pax">${escapeHtml(shorten(txt, 26))}</span>`;
+    html += `<span class="pill pill-pax">${escapeHtml(shorten(txt, 14))}</span>`;
   }
   const freshSummary = summarizeCounts(data.fresh);
   if(freshSummary){
-    html += `<span class="pill pill-fresh">${escapeHtml(shorten(freshSummary, 26))}</span>`;
+    html += `<span class="pill pill-fresh">${escapeHtml(shorten(freshSummary, 14))}</span>`;
   } else if((data.note || '').trim()){
-    html += `<span class="pill pill-note">${escapeHtml(shorten(data.note, 22))}</span>`;
+    html += `<span class="pill pill-note">${escapeHtml(shorten(data.note, 12))}</span>`;
   }
   html += `</div>`;
   seat.innerHTML = html;
@@ -274,7 +689,7 @@ function renderQtyProducts(containerId, products, dataObj, mode){
     div.innerHTML = `
       <div class="product-name">${name}</div>
       <div class="qty">
-        <div class="muted">${qty > 0 ? qty + ' ks' : '0 ks'}</div>
+        <div class="muted">${qty} ks</div>
         <div class="qty-controls">
           <button type="button" class="qty-btn" data-action="minus" data-mode="${mode}" data-name="${name}">−</button>
           <div class="qty-number">${qty}</div>
@@ -357,6 +772,12 @@ function deleteSeatData(){
   renderAll();
 }
 
+function applyTheme(){
+  document.body.classList.toggle('dark', !!state.dark);
+  document.getElementById('themeLabel').textContent = state.dark ? 'Aktuálně: tmavý režim' : 'Aktuálně: světlý režim';
+  document.getElementById('themeBtn').textContent = state.dark ? 'Světlý režim' : 'Dark mode';
+}
+
 function persist(){
   state.flightNo = document.getElementById('flightNo').value;
   state.generalNote = document.getElementById('generalNote').value;
@@ -368,11 +789,12 @@ function loadState(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw){
       const parsed = JSON.parse(raw);
-      state = { flightNo: parsed.flightNo || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, seats: parsed.seats || {} };
+      state = { flightNo: parsed.flightNo || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, dark: !!parsed.dark, seats: parsed.seats || {} };
     }
   }catch(e){}
   document.getElementById('flightNo').value = state.flightNo;
   document.getElementById('generalNote').value = state.generalNote;
+  applyTheme();
 }
 
 function updateSummary(){
@@ -426,6 +848,7 @@ function renderFreshList(){
 }
 
 function renderAll(){
+  applyTheme();
   renderSeatMap();
   updateSummary();
   renderSpecialPaxList();
@@ -448,7 +871,7 @@ function importJson(file){
   reader.onload = e => {
     try{
       const parsed = JSON.parse(e.target.result);
-      state = { flightNo: parsed.flightNo || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, seats: parsed.seats || {} };
+      state = { flightNo: parsed.flightNo || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, dark: !!parsed.dark, seats: parsed.seats || {} };
       document.getElementById('flightNo').value = state.flightNo;
       document.getElementById('generalNote').value = state.generalNote;
       persist();
@@ -461,7 +884,16 @@ function importJson(file){
   reader.readAsText(file);
 }
 
-function rotateMap(){ state.reverse = !state.reverse; persist(); renderAll(); }
+function rotateMap(){
+  state.reverse = !state.reverse;
+  persist();
+  renderAll();
+}
+function toggleTheme(){
+  state.dark = !state.dark;
+  persist();
+  renderAll();
+}
 
 function jumpToSeat(){
   const value = document.getElementById('searchSeat').value.trim().toUpperCase();
@@ -477,6 +909,7 @@ function loadSample(){
     flightNo:'QS1234 PRG–PMI',
     generalNote:'Ukázková data',
     reverse:false,
+    dark:false,
     seats:{
       "1A": {extraCatering:{"SLML":1}, customCatering:'', specialPax:["INF"], customPax:'', fresh:{}, note:'rodina s dítětem'},
       "4C": {extraCatering:{}, customCatering:'', specialPax:["WCHR"], customPax:'', fresh:{}, note:'pomoc při deboardingu'},
@@ -494,6 +927,7 @@ function loadSample(){
 document.getElementById('closeModal').addEventListener('click', closeSeatModal);
 document.getElementById('saveSeatData').addEventListener('click', saveSeatData);
 document.getElementById('deleteSeatData').addEventListener('click', deleteSeatData);
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
 document.getElementById('seatModal').addEventListener('click', e => { if(e.target.id === 'seatModal') closeSeatModal(); });
 document.getElementById('flightNo').addEventListener('input', persist);
 document.getElementById('generalNote').addEventListener('input', persist);
@@ -506,7 +940,7 @@ document.getElementById('importFile').addEventListener('change', e => { if(e.tar
 document.getElementById('sampleBtn').addEventListener('click', loadSample);
 document.getElementById('clearBtn').addEventListener('click', () => {
   if(confirm('Opravdu vymazat všechna data?')){
-    state = { flightNo:'', generalNote:'', reverse:false, seats:{} };
+    state = { flightNo:'', generalNote:'', reverse:false, dark:false, seats:{} };
     document.getElementById('flightNo').value = '';
     document.getElementById('generalNote').value = '';
     persist();
