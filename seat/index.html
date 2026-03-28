@@ -490,6 +490,12 @@ function renderHeader(){
   h.innerHTML = `<div></div><div>${order[0]}</div><div>${order[1]}</div><div>${order[2]}</div><div></div><div>${order[3]}</div><div>${order[4]}</div><div>${order[5]}</div>`;
 }
 
+function updateRotateBtn(){
+  const btn = document.getElementById('rotateBtn');
+  if(!btn) return;
+  btn.textContent = state.reverse ? 'Otočit mapu ↓' : 'Otočit mapu ↑';
+}
+
 function renderSeatMap(){
   const container = document.getElementById('seatRows');
   container.innerHTML = '';
@@ -828,7 +834,7 @@ function openSummaryModal(type){
 }
 
 function closeSummaryModal(){ document.getElementById('summaryModal').classList.remove('open'); }
-function renderAll(){ applyTheme(); renderSeatMap(); updateSummary(); renderSpecialPaxList(); renderFreshList(); renderCateringList(); }
+function renderAll(){ applyTheme(); updateRotateBtn(); renderSeatMap(); updateSummary(); renderSpecialPaxList(); renderFreshList(); renderCateringList(); }
 
 function exportJson(){
   persist();
@@ -1032,7 +1038,14 @@ document.getElementById('routing').addEventListener('input', e => {
 document.getElementById('routing').addEventListener('input', persist);
 document.getElementById('flightTime').addEventListener('input', persist);
 document.getElementById('paxCount').addEventListener('input', e => {
-  let val = e.target.value.replace(/[^0-9+]/g,'');
+  let raw = e.target.value;
+  if(raw === ''){
+    e.target.value = '';
+    persist();
+    return;
+  }
+
+  let val = raw.replace(/[^0-9+]/g,'');
   const digits = val.replace(/\+/g,'');
   const hasPlus = val.includes('+');
 
@@ -1040,7 +1053,7 @@ document.getElementById('paxCount').addEventListener('input', e => {
     const parts = val.split('+');
     const left = (parts[0] || '').replace(/\D/g,'').slice(0,3);
     const right = (parts[1] || '').replace(/\D/g,'').slice(0,2);
-    val = left + '+' + right;
+    val = left + (left ? '+' : '') + right;
   } else {
     if(digits.length >= 3){
       val = digits.slice(0,3) + '+';
