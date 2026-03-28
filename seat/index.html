@@ -189,6 +189,19 @@ button.small{padding:8px 10px;font-size:.9rem;flex:0 0 calc(50% - 4px)}
   .search-action{grid-column:auto}
   .letter-picker{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+#flightNo, #routing { text-transform: uppercase; }
+
+
+.timer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.timer-box{background:var(--panel-soft);border:1px solid var(--line);border-radius:14px;padding:10px}
+.timer-display{font-size:1.2rem;font-weight:800;color:var(--heading);margin:6px 0}
+.timer-actions{display:flex;gap:8px;flex-wrap:wrap}
+.timer-actions button{flex:1 1 calc(50% - 4px)}
+@media (max-width:640px){
+  .timer-grid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -198,8 +211,53 @@ button.small{padding:8px 10px;font-size:.9rem;flex:0 0 calc(50% - 4px)}
 
     <div class="card">
       <h2>Informace o letu</h2>
-      <label for="flightNo">Číslo letu/routing</label>
-      <input id="flightNo" type="text" />
+      <div class="row">
+        <div style="flex:1 1 calc(50% - 4px)">
+          <label for="flightNo">Číslo letu</label>
+          <input id="flightNo" type="text" inputmode="text" />
+        </div>
+        <div style="flex:1 1 calc(50% - 4px)">
+          <label for="routing">Routing</label>
+          <input id="routing" type="text" inputmode="text" />
+        </div>
+      </div>
+      <div style="height:8px"></div>
+      <div class="row">
+        <div style="flex:1 1 calc(50% - 4px)">
+          <label for="flightTime">Doba letu</label>
+          <input id="flightTime" type="time" />
+        </div>
+        <div style="flex:1 1 calc(50% - 4px)">
+          <label for="paxCount">Počet cestujících (xxx+x)</label>
+          <input id="paxCount" type="text" inputmode="numeric" pattern="[0-9+]*" />
+        </div>
+      </div>
+      <div style="height:8px"></div>
+      <div class="row">
+        <div style="flex:1 1 calc(50% - 4px)">
+          <label for="startTime">Čas startu</label>
+          <input id="startTime" type="time" />
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="timer-grid">
+        <div class="timer-box">
+          <h2 style="margin:0 0 6px">Minutka</h2>
+          <div class="timer-display" id="countdownDisplay">--:--:--</div>
+          <div class="timer-actions">
+            <button id="countdownStartBtn" class="secondary">Spustit</button>
+            <button id="countdownResetBtn" class="ghost">Reset</button>
+          </div>
+        </div>
+        <div class="timer-box">
+          <h2 style="margin:0 0 6px">Stopky</h2>
+          <div class="timer-display" id="stopwatchDisplay">--:--:--</div>
+          <div class="timer-actions">
+            <button id="stopwatchStartBtn" class="secondary">Spustit</button>
+            <button id="stopwatchResetBtn" class="ghost">Reset</button>
+          </div>
+        </div>
+      </div>
       <div style="height:8px"></div>
       <label for="generalNote">Poznámka</label>
       <textarea id="generalNote"></textarea>
@@ -212,6 +270,31 @@ button.small{padding:8px 10px;font-size:.9rem;flex:0 0 calc(50% - 4px)}
         <div class="stat"><span class="muted">Extra catering</span><b id="countCatering">0</b></div>
         <div class="stat"><span class="muted">Fresh produkty</span><b id="countFresh">0</b></div>
       </div>
+    </div>
+
+
+    <div class="card">
+      <div class="row space-between" style="margin-bottom:8px">
+        <h2 style="margin:0">Special PAX přehled</h2>
+        <button id="specialPaxSummaryBtn" class="secondary small">Souhrn</button>
+      </div>
+      <div class="list" id="specialPaxList"></div>
+    </div>
+
+    <div class="card">
+      <div class="row space-between" style="margin-bottom:8px">
+        <h2 style="margin:0">Fresh přehled</h2>
+        <button id="freshSummaryBtn" class="secondary small">Souhrn</button>
+      </div>
+      <div class="list" id="freshList"></div>
+    </div>
+
+    <div class="card">
+      <div class="row space-between" style="margin-bottom:8px">
+        <h2 style="margin:0">Přehled cateringu</h2>
+        <button id="cateringSummaryBtn" class="secondary small">Souhrn</button>
+      </div>
+      <div class="list" id="cateringList"></div>
     </div>
 
     <div class="card">
@@ -234,30 +317,6 @@ button.small{padding:8px 10px;font-size:.9rem;flex:0 0 calc(50% - 4px)}
         <div><strong>SNML</strong> – Řízky kuřecí velké</div>
         <div><strong>SOML</strong> – Řízky kuřecí malé</div>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="row space-between" style="margin-bottom:8px">
-        <h2 style="margin:0">Special PAX přehled</h2>
-        <button id="specialPaxSummaryBtn" class="secondary small">Souhrn special PAX</button>
-      </div>
-      <div class="list" id="specialPaxList"></div>
-    </div>
-
-    <div class="card">
-      <div class="row space-between" style="margin-bottom:8px">
-        <h2 style="margin:0">Fresh přehled</h2>
-        <button id="freshSummaryBtn" class="secondary small">Souhrn freshů</button>
-      </div>
-      <div class="list" id="freshList"></div>
-    </div>
-
-    <div class="card">
-      <div class="row space-between" style="margin-bottom:8px">
-        <h2 style="margin:0">Přehled cateringu</h2>
-        <button id="cateringSummaryBtn" class="secondary small">Souhrn cateringu</button>
-      </div>
-      <div class="list" id="cateringList"></div>
     </div>
 
     <div class="card">
@@ -399,7 +458,7 @@ const FRESH_PRODUCTS = ['PŠ', 'PV', 'Croque', 'Bloomer', 'Párek', 'Pasta', 'Po
 const CATERING_PRODUCTS = ['SLML', 'SMML', 'SNML', 'SOML', 'SYML', 'SZML'];
 const HIDDEN_SEATS = ['6D','6E','6F'];
 
-let state = { flightNo:'', generalNote:'', reverse:false, dark:false, show6def:false, seats:{} };
+let state = { flightNo:'', routing:'', flightTime:'', paxCount:'', startTime:'', generalNote:'', reverse:false, dark:false, show6def:false, seats:{} };
 let currentSeat = null;
 let modalFresh = {};
 let modalCatering = {};
@@ -596,6 +655,10 @@ function applyTheme(){
 
 function persist(){
   state.flightNo = document.getElementById('flightNo').value;
+  state.routing = document.getElementById('routing').value;
+  state.flightTime = document.getElementById('flightTime').value;
+  state.paxCount = document.getElementById('paxCount').value;
+  state.startTime = document.getElementById('startTime').value;
   state.generalNote = document.getElementById('generalNote').value;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
@@ -605,10 +668,14 @@ function loadState(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw){
       const parsed = JSON.parse(raw);
-      state = { flightNo: parsed.flightNo || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, dark: !!parsed.dark, show6def: !!parsed.show6def, seats: parsed.seats || {} };
+      state = { flightNo: parsed.flightNo || '', routing: parsed.routing || '', flightTime: parsed.flightTime || '', paxCount: parsed.paxCount || '', startTime: parsed.startTime || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, dark: !!parsed.dark, show6def: !!parsed.show6def, seats: parsed.seats || {} };
     }
   }catch(e){}
   document.getElementById('flightNo').value = state.flightNo;
+  document.getElementById('routing').value = state.routing || '';
+  document.getElementById('flightTime').value = state.flightTime || '';
+  document.getElementById('paxCount').value = state.paxCount || '';
+  document.getElementById('startTime').value = state.startTime || '';
   document.getElementById('generalNote').value = state.generalNote;
   applyTheme();
   updateLetterPicker();
@@ -777,7 +844,7 @@ function importJson(file){
   reader.onload = e => {
     try{
       const parsed = JSON.parse(e.target.result);
-      state = { flightNo: parsed.flightNo || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, dark: !!parsed.dark, show6def: !!parsed.show6def, seats: parsed.seats || {} };
+      state = { flightNo: parsed.flightNo || '', routing: parsed.routing || '', flightTime: parsed.flightTime || '', paxCount: parsed.paxCount || '', startTime: parsed.startTime || '', generalNote: parsed.generalNote || '', reverse: !!parsed.reverse, dark: !!parsed.dark, show6def: !!parsed.show6def, seats: parsed.seats || {} };
       document.getElementById('flightNo').value = state.flightNo;
       document.getElementById('generalNote').value = state.generalNote;
       persist();
@@ -813,6 +880,88 @@ function jumpToSeat(){
 }
 
 
+
+let countdownInterval = null;
+let stopwatchInterval = null;
+
+function parseTimeToToday(timeStr){
+  if(!timeStr || !/^\d{2}:\d{2}$/.test(timeStr)) return null;
+  const [h,m] = timeStr.split(':').map(Number);
+  const now = new Date();
+  const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+  return dt;
+}
+function parseDuration(timeStr){
+  if(!timeStr || !/^\d{2}:\d{2}$/.test(timeStr)) return null;
+  const [h,m] = timeStr.split(':').map(Number);
+  return ((h * 60) + m) * 60;
+}
+function formatHMS(totalSeconds){
+  const sign = totalSeconds < 0 ? '-' : '';
+  totalSeconds = Math.abs(Math.floor(totalSeconds));
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return `${sign}${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function stopCountdown(){
+  if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; }
+}
+function stopStopwatch(){
+  if(stopwatchInterval){ clearInterval(stopwatchInterval); stopwatchInterval = null; }
+}
+function updateCountdownDisplay(){
+  const start = parseTimeToToday(document.getElementById('startTime').value);
+  const duration = parseDuration(document.getElementById('flightTime').value);
+  const display = document.getElementById('countdownDisplay');
+  if(!start || duration === null){
+    display.textContent = '--:--:--';
+    return;
+  }
+  const end = new Date(start.getTime() + duration * 1000);
+  const diff = Math.floor((end.getTime() - Date.now()) / 1000);
+  display.textContent = formatHMS(diff);
+}
+function updateStopwatchDisplay(){
+  const start = parseTimeToToday(document.getElementById('startTime').value);
+  const display = document.getElementById('stopwatchDisplay');
+  if(!start){
+    display.textContent = '--:--:--';
+    return;
+  }
+  const diff = Math.floor((Date.now() - start.getTime()) / 1000);
+  display.textContent = formatHMS(diff);
+}
+function startCountdown(){
+  const start = parseTimeToToday(document.getElementById('startTime').value);
+  const duration = parseDuration(document.getElementById('flightTime').value);
+  if(!start || duration === null){
+    alert('Zadej nejdřív Čas startu a Dobu letu.');
+    return;
+  }
+  stopCountdown();
+  updateCountdownDisplay();
+  countdownInterval = setInterval(updateCountdownDisplay, 1000);
+}
+function resetCountdown(){
+  stopCountdown();
+  document.getElementById('countdownDisplay').textContent = '--:--:--';
+}
+function startStopwatch(){
+  const start = parseTimeToToday(document.getElementById('startTime').value);
+  if(!start){
+    alert('Zadej nejdřív Čas startu.');
+    return;
+  }
+  stopStopwatch();
+  updateStopwatchDisplay();
+  stopwatchInterval = setInterval(updateStopwatchDisplay, 1000);
+}
+function resetStopwatch(){
+  stopStopwatch();
+  document.getElementById('stopwatchDisplay').textContent = '--:--:--';
+}
+
 function updateLetterPicker(){
   const active = (document.getElementById('seatLetterInput').value || '').toUpperCase();
   document.querySelectorAll('.letter-btn').forEach(btn => {
@@ -823,7 +972,11 @@ function updateLetterPicker(){
 
 function loadSample(){
   state = {
-    flightNo:'QS1234 PRG–PMI',
+    flightNo:'QS1234',
+    routing:'PRG–PMI',
+    flightTime:'02:35',
+    paxCount:'189+2',
+    startTime:'10:15',
     generalNote:'Ukázková data',
     reverse:false,
     dark:false,
@@ -838,6 +991,10 @@ function loadSample(){
     }
   };
   document.getElementById('flightNo').value = state.flightNo;
+  document.getElementById('routing').value = state.routing || '';
+  document.getElementById('flightTime').value = state.flightTime || '';
+  document.getElementById('paxCount').value = state.paxCount || '';
+  document.getElementById('startTime').value = state.startTime || '';
   document.getElementById('generalNote').value = state.generalNote;
   persist();
   updateLetterPicker();
@@ -856,6 +1013,24 @@ document.getElementById('closeSummaryModal').addEventListener('click', closeSumm
 document.getElementById('seatModal').addEventListener('click', e => { if(e.target.id === 'seatModal') closeSeatModal(); });
 document.getElementById('summaryModal').addEventListener('click', e => { if(e.target.id === 'summaryModal') closeSummaryModal(); });
 document.getElementById('flightNo').addEventListener('input', persist);
+
+document.getElementById('flightNo').addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase();
+});
+document.getElementById('routing').addEventListener('input', e => {
+  let val = e.target.value.toUpperCase().replace(/[^A-Z]/g,'');
+  if(val.length > 3){
+    val = val.slice(0,3) + '–' + val.slice(3,6);
+  }
+  e.target.value = val;
+});
+
+document.getElementById('routing').addEventListener('input', persist);
+document.getElementById('flightTime').addEventListener('input', persist);
+document.getElementById('paxCount').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/[^0-9+]/g,'');
+  persist();
+});
 document.getElementById('generalNote').addEventListener('input', persist);
 document.getElementById('rotateBtn').addEventListener('click', rotateMap);
 document.getElementById('findBtn').addEventListener('click', jumpToSeat);
@@ -870,14 +1045,25 @@ document.getElementById('seatRowInput').addEventListener('keydown', e => { if(e.
 document.getElementById('exportBtn').addEventListener('click', exportJson);
 document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
 document.getElementById('importFile').addEventListener('change', e => { if(e.target.files[0]) importJson(e.target.files[0]); e.target.value = ''; });
+document.getElementById('countdownStartBtn').addEventListener('click', startCountdown);
+document.getElementById('countdownResetBtn').addEventListener('click', resetCountdown);
+document.getElementById('stopwatchStartBtn').addEventListener('click', startStopwatch);
+document.getElementById('stopwatchResetBtn').addEventListener('click', resetStopwatch);
+
 document.getElementById('clearBtn').addEventListener('click', () => {
   if(confirm('Opravdu vymazat všechna data?')){
-    state = { flightNo:'', generalNote:'', reverse:false, dark:false, show6def:false, seats:{} };
+    state = { flightNo:'', routing:'', flightTime:'', paxCount:'', startTime:'', generalNote:'', reverse:false, dark:false, show6def:false, seats:{} };
     document.getElementById('flightNo').value = '';
+    document.getElementById('routing').value = '';
+    document.getElementById('flightTime').value = '';
+    document.getElementById('paxCount').value = '';
+    document.getElementById('startTime').value = '';
     document.getElementById('generalNote').value = '';
     document.getElementById('seatRowInput').value = '';
     document.getElementById('seatLetterInput').value = '';
     updateLetterPicker();
+    resetCountdown();
+    resetStopwatch();
     persist();
     renderAll();
   }
