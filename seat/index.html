@@ -312,10 +312,24 @@ button.small{padding:8px 10px;font-size:.9rem;flex:0 0 calc(50% - 4px)}
       <div style="height:12px"></div>
       <h2>Legenda pro extra catering</h2>
       <div class="code-help">
-        <div><strong>SLML</strong> – Řízky vepřové velké</div>
-        <div><strong>SMML</strong> – Řízky vepřové malé</div>
-        <div><strong>SNML</strong> – Řízky kuřecí velké</div>
-        <div><strong>SOML</strong> – Řízky kuřecí malé</div>
+        <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
+          <tr>
+            <td style="font-weight:700;padding:4px 6px;">SLML</td>
+            <td style="padding:4px 6px;">Řízky vepřové velké</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;padding:4px 6px;">SMML</td>
+            <td style="padding:4px 6px;">Řízky vepřové malé</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;padding:4px 6px;">SNML</td>
+            <td style="padding:4px 6px;">Řízky kuřecí velké</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;padding:4px 6px;">SOML</td>
+            <td style="padding:4px 6px;">Řízky kuřecí malé</td>
+          </tr>
+        </table>
       </div>
     </div>
 
@@ -901,7 +915,13 @@ function parseTimeToToday(timeStr){
   if(!timeStr || !/^\d{2}:\d{2}$/.test(timeStr)) return null;
   const [h,m] = timeStr.split(':').map(Number);
   const now = new Date();
-  const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+  let dt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+
+  // Use the most recent occurrence of the entered time.
+  // Example: now 01:18 and entered 23:00 => yesterday 23:00.
+  if(dt.getTime() > now.getTime()){
+    dt.setDate(dt.getDate() - 1);
+  }
   return dt;
 }
 function parseDuration(timeStr){
