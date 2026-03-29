@@ -491,12 +491,18 @@
 <script>
   function toggleSbyFields() {
     const hasSby = document.querySelector('input[name="hasSby"]:checked')?.value;
-    document.getElementById("sbyFields").style.display =
-      hasSby === "yes" ? "block" : "none";
+    const usePlanningCall = document.querySelector('input[name="usePlanningCall"]:checked')?.value;
+
+    const sbyFields = document.getElementById("sbyFields");
+    const planningCallFields = document.getElementById("planningCallFields");
+
+    sbyFields.style.display = hasSby === "yes" ? "block" : "none";
+    planningCallFields.style.display =
+      hasSby === "yes" && usePlanningCall === "yes" ? "block" : "none";
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('input[name="hasSby"]').forEach(el => {
+    document.querySelectorAll('input[name="hasSby"], input[name="usePlanningCall"]').forEach(el => {
       el.addEventListener("change", toggleSbyFields);
     });
     toggleSbyFields();
