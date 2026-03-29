@@ -346,7 +346,7 @@
     th, td {
       text-align: left;
       vertical-align: top;
-      padding: 14px 12px;
+      padding: 10px 10px;
       border-bottom: 1px solid var(--line);
       word-break: break-word;
     }
@@ -354,7 +354,7 @@
     th {
       background: var(--blue-soft);
       color: var(--blue-dark);
-      font-size: 12px;
+      font-size: 14px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       position: sticky;
@@ -569,7 +569,7 @@
         <a class="pill" href="#first-steps">Nezapomeň</a>
         <a class="pill" href="#doctor-call">Vyvolej doktora</a>
         <a class="pill" href="#cpr">CPR</a>
-        <a class="pill" href="#measurements">Měření</a>
+        <a class="pill" href="#measurements">Základní měření</a>
         <a class="pill menu-pill" href="#kit-first-aid">First Aid Kit</a>
         <a class="pill menu-pill" href="#kit-emergency">Emergency Medical Kit</a>
         <a class="pill menu-pill" href="#kit-additional">First Aid Additional Equipment Kit</a>
@@ -579,8 +579,7 @@
 
     <section class="section note">
       <div class="note-card danger-box" id="first-steps">
-        <div class="kicker">Nezapomeň</div>
-        <h2>První kroky při zásahu</h2>
+        <h2>Nezapomeň</h2>
         <ul>
           <li>Vyvolej lékaře a informuj posádku.</li>
           <li>Záklon hlavy a kontrola dýchání.</li>
@@ -590,7 +589,6 @@
         </ul>
       </div>
       <div class="note-card ok-box" id="doctor-call">
-        <div class="kicker">Hlášení pro cestující</div>
         <h2>Vyvolej doktora</h2>
         <p><strong>CZ:</strong> Vážení cestující, jeden z našich cestujících potřebuje lékařskou pomoc. Pokud se na palubě nachází lékař, případně jiný zdravotnický personál, prosíme, aby okamžitě kontaktoval posádku.</p>
         <p><strong>EN:</strong> Dear passengers, one of our passengers needs medical assistance. If there is a doctor, nurse or paramedic on board, please contact our cabin crew immediately.</p>
@@ -600,10 +598,8 @@
     <section class="section card" id="cpr">
       <div class="headline-row">
         <div>
-          <div class="kicker">Život zachraňující minimum</div>
           <h2>CPR</h2>
         </div>
-        <div class="mini">Poměry podle věku</div>
       </div>
       <div class="cpr">
         <div class="item">
@@ -627,22 +623,21 @@
     <section class="section card" id="measurements">
       <div class="headline-row">
         <div>
-          <div class="kicker">Kontrola stavu</div>
           <h2>Základní měření</h2>
         </div>
       </div>
       <div class="measure">
         <div class="item">
-          <div class="mini">Tlak</div>
+          <h3>Tlak</h3>
           <strong>± 120/80</strong>
         </div>
         <div class="item">
-          <div class="mini">Cukr</div>
+          <h3>Cukr</h3>
           <strong>3,6–6,6 mmol/l</strong>
-          <div class="mini">do 12 je ještě tolerovatelné</div>
+          <div class="mini">do 12  ještě tolerovatelné</div>
         </div>
         <div class="item">
-          <div class="mini">Saturace</div>
+          <h3>Saturace</h3>
           <strong>&gt; 90 %</strong>
         </div>
       </div>
@@ -652,20 +647,22 @@
 
     <section class="section grid-2">
       <div class="card" id="kit-first-aid">
-        <span class="tag blue">First Aid Kit</span>
+        <div>
+          <h2>First Aid Kit</h2>
+        </div>
         <div class="table-wrap">
           <table class="med-table">
             <colgroup><col><col><col></colgroup>
             <thead>
-              <tr><th>Lék</th><th>Kdy</th><th>Kdy ne</th></tr>
+              <tr><th>Co?</th><th>Kdy?</th><th>Kdy ne?</th></tr>
             </thead>
             <tbody>
-              <tr><td>Ibumax / Ibalgin / Ibuprofen 200 mg</td><td>Zánětlivá onemocnění, bolest, migréna.</td><td>Onemocnění trávicího traktu, alergie.</td></tr>
-              <tr><td>Paralen 500 mg</td><td>Akutní horečka, bolest zubů a hlavy.</td><td>Onemocnění jater.</td></tr>
-              <tr><td>Valetol</td><td>Bolest zubů, hlavy, zánět HCD.</td><td>Onemocnění jater, dušnost.</td></tr>
+              <tr><td>Ibumax 200 mg (Ibalgin, Ibuprofen)</td><td>Zánětlivá onemocnění, bolest, migréna.</td><td>Onemocnění trávicího traktu, alergie.</td></tr>
+              <tr><td>Paralen 500 mg (Paracetamol)</td><td>Akutní horečka, bolest zubů a hlavy.</td><td>Onemocnění jater.</td></tr>
+              <tr><td>Valetol (Propyfenazol)</td><td>Bolest zubů, hlavy, zánět HCD.</td><td>Onemocnění jater, dušnost.</td></tr>
               <tr><td>Kinedryl</td><td>Kinetóza.</td><td>Intoxikace, těhotenství.</td></tr>
-              <tr><td>Rennie</td><td>Nauzea, zvracení, pálení žáhy.</td><td>Do 15 let.</td></tr>
-              <tr><td>Endiaron</td><td>Silné průjmy.</td><td>Do 40 kg.</td></tr>
+              <tr><td>Rennie (Uhličitan vápenatý)</td><td>Nauzea, zvracení, pálení žáhy.</td><td>Do 15 let.</td></tr>
+              <tr><td>Endiaron (Kloroxin)</td><td>Silné průjmy.</td><td>Do 40 kg.</td></tr>
               <tr><td>Dithiaden</td><td>Alergická reakce, kopřivka, mírné otoky.</td><td>Do 2 let.</td></tr>
               <tr><td>Grandaxin</td><td>Strach, neurotické stavy, deprese.</td><td>Do 18 let.</td></tr>
               <tr><td>Diazepam</td><td>Úzkost, abstinenční příznaky, po epilepsii.</td><td>Intoxikace, spánková apnoe.</td></tr>
@@ -677,39 +674,43 @@
       </div>
 
       <div class="card" id="kit-emergency">
-        <span class="tag">Emergency Medical Kit</span>
+        <div>
+          <h2>Emergency Medical Kit</h2>
+        </div>
         <div class="table-wrap">
           <table class="med-table">
             <colgroup><col><col><col></colgroup>
             <thead>
-              <tr><th>Pomůcka / lék</th><th>Použití</th><th>Omezení</th></tr>
+              <tr><th>Co?</th><th>Kdy?</th><th>Kdy ne?</th></tr>
             </thead>
             <tbody>
               <tr><td>Nitromint sprej</td><td>Záchvat anginy pectoris.</td><td>Tlak pod 120/70.</td></tr>
-              <tr><td>EpiPen</td><td>Anafylaxe.</td><td>Jen lékař nebo pacient sám.</td></tr>
-              <tr><td>Berodual sprej</td><td>Astma, zúžení DC.</td><td>—</td></tr>
+              <tr><td>Epipen (jen lékař nebo pacient sám)</td><td>Anafylaxe.</td><td></td></tr>
+              <tr><td>Berodual sprej</td><td>Astma, zúžení dýchacích cest.</td><td>—</td></tr>
               <tr><td>Fyziologický roztok (NaCl 0,9 %)</td><td>Ředění, výplach, popáleniny.</td><td>—</td></tr>
-              <tr><td>Tonometr, glukometr, oxymetr</td><td>Monitoring základních hodnot.</td><td>—</td></tr>
+              <tr><td>+ tonometr, glukometr, oxymetr</td><td></td><td></td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <div class="card" id="kit-additional">
-        <span class="tag">First Aid Additional Equipment Kit</span>
+        <div>
+          <h2>First Aid Additional Equipment Kit</h2>
+        </div>
         <div class="table-wrap">
           <table class="med-table wide-first">
             <colgroup><col><col><col></colgroup>
             <thead>
-              <tr><th>Pomůcka / lék</th><th>Použití</th><th>Omezení</th></tr>
+              <tr><th>Co?</th><th>Kdy?</th><th>Kdy ne?</th></tr>
             </thead>
             <tbody>
               <tr><td>Occusept Aqua</td><td>Zklidnění očí, zánět spojivek, suché oči.</td><td>—</td></tr>
-              <tr><td>Paralen 100 mg</td><td>Děti, forma čípku.</td><td>Viz Paralen.</td></tr>
-              <tr><td>Diazepam Desitin Rectal</td><td>Rektální forma po záchvatu.</td><td>Viz Diazepam.</td></tr>
-              <tr><td>Acylpyrin 500 mg</td><td>Infarkt.</td><td>Do 16 let, alergie na ASA.</td></tr>
+              <tr><td>Paralen 100 mg</td><td>Viz Paralen. Pro děti, ve formě čípku.</td><td></td></tr>
+              <tr><td>Diazepam Desitin Rectal</td><td>Viz Diazepam, gel pro rektální podání.</td><td></td></tr>
+              <tr><td>Acylpyrin 500 mg</td><td>Infarkt.</td><td>Do 16 let, alergie na kys. acetylsalicylovou.</td></tr>
               <tr><td>WaterJel</td><td>Ošetření popálenin.</td><td>Malé děti – riziko podchlazení.</td></tr>
-              <tr><td>Inf. ambuvak, inf. maska, porodnický balíček</td><td>Podpora dýchání a mimořádné situace.</td><td>—</td></tr>
+              <tr><td>+ inf. ambuvak, inf. maska, porodnický balíček</td><td></td><td></td></tr>
             </tbody>
           </table>
         </div>
@@ -719,7 +720,6 @@
     <section class="section card" id="conditions">
       <div class="headline-row">
         <div>
-          <div class="kicker">Rychlá orientace</div>
           <h2>Nejčastější stavy a řešení</h2>
         </div>
       </div>
