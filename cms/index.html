@@ -345,17 +345,6 @@
       min-width: 410px;
     }
 
-    table.conditions-table th,
-    table.conditions-table td {
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    table.conditions-table td:nth-child(3),
-    table.conditions-table th:nth-child(3) {
-      font-size: 14px;
-      line-height: 1.45;
-    }
 
     th, td {
       text-align: left;
@@ -432,6 +421,9 @@
     }
 
     @media (max-width: 768px) {
+      :root {
+        --table-font: 14px;
+      }
       .wrap {
         padding: 14px;
       }
@@ -487,16 +479,6 @@
         min-width: 980px;
       }
 
-      table.conditions-table th,
-      table.conditions-table td {
-        font-size: 13px;
-        line-height: 1.4;
-      }
-
-      table.conditions-table td:nth-child(3),
-      table.conditions-table th:nth-child(3) {
-        font-size: 13px;
-      }
 
       th, td {
         padding: 10px 9px;
@@ -584,7 +566,19 @@
         position: static;
       }
     }
-  </style>
+  
+    /* Unified table font size */
+    :root {
+      --table-font: 14px;
+    }
+
+    table,
+    table th,
+    table td {
+      font-size: var(--table-font);
+    }
+
+</style>
 </head>
 <body>
   <div class="wrap">
