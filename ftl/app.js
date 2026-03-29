@@ -21,6 +21,7 @@ const BASE_TABLE = [
   { start: "19:00", end: "23:59", values: ["11:00", "11:00", "10:30", "10:00", "09:30"] }
 ];
 
+// Tabulka „e“ - lokální čas
 const EXTENDED_TABLE = [
   { start: "19:00", end: "04:59", values: ["11:00", "11:00", "10:30", "10:00", "09:30"], overnight: true },
   { start: "05:00", end: "05:14", values: ["12:00", "12:00", "11:30", "11:00", "10:30"] },
@@ -77,6 +78,11 @@ function getSelectedServiceType() {
 
 function getSelectedHasSby() {
   const selected = document.querySelector('input[name="hasSby"]:checked');
+  return selected ? selected.value === "yes" : false;
+}
+
+function getSelectedUsePlanningCall() {
+  const selected = document.querySelector('input[name="usePlanningCall"]:checked');
   return selected ? selected.value === "yes" : false;
 }
 
@@ -218,10 +224,19 @@ function calculateResults() {
 
   const sectors = parseInt(document.getElementById("sectors")?.value ?? "1", 10);
   const hasSby = getSelectedHasSby();
+  const usePlanningCall = hasSby ? getSelectedUsePlanningCall() : false;
 
-  const sbyStart = hasSby ? toMinutes(document.getElementById("sbyStart")?.value || "00:00") : null;
-  const sby = hasSby ? calculateStandbyDurationFromStart(report, sbyStart) : 0;
-  const sbyCallTime = hasSby ? toMinutes(document.getElementById("sbyCallTime")?.value || "00:00") : null;
+  const sbyStart = hasSby
+    ? toMinutes(document.getElementById("sbyStart")?.value || "00:00")
+    : null;
+
+  const sby = hasSby
+    ? calculateStandbyDurationFromStart(report, sbyStart)
+    : 0;
+
+  const sbyCallTime = hasSby && usePlanningCall
+    ? toMinutes(document.getElementById("sbyCallTime")?.value || "00:00")
+    : null;
 
   const lastLeg = toMinutes(document.getElementById("lastLeg")?.value || "00:00");
   const taxi = toMinutes(document.getElementById("taxi")?.value || "00:00");
@@ -267,6 +282,7 @@ function calculateResults() {
     report,
     sectors,
     hasSby,
+    usePlanningCall,
     sbyStart,
     sby,
     sbyCallTime,
@@ -314,19 +330,19 @@ function renderResults(result) {
   document.getElementById("maxFdpCaptain").textContent = minutesToDuration(result.maxFdpCaptain);
 
   document.getElementById("fdpEndText").textContent =
-    `Konec duty: ${minutesToTime(result.dutyEndLocal)} local / ${minutesToTime(result.dutyEndUtc)} UTC`;
+    `Konec duty: ${minutesToTime(result.dutyEndLocal)} LT / ${minutesToTime(result.dutyEndUtc)} UTC`;
 
   document.getElementById("fdpEndCaptainText").textContent =
-    `Konec duty: ${minutesToTime(result.dutyEndCaptainLocal)} local / ${minutesToTime(result.dutyEndCaptainUtc)} UTC`;
+    `Konec duty: ${minutesToTime(result.dutyEndCaptainLocal)} LT / ${minutesToTime(result.dutyEndCaptainUtc)} UTC`;
 
   document.getElementById("latestDeparture").textContent =
-    `${minutesToTime(result.latestDepartureLocal)} local`;
+    `${minutesToTime(result.latestDepartureLocal)} LT`;
 
   document.getElementById("latestDepartureUtc").textContent =
     `${minutesToTime(result.latestDepartureUtc)} UTC`;
 
   document.getElementById("latestDepartureCaptain").textContent =
-    `${minutesToTime(result.latestDepartureCaptainLocal)} local`;
+    `${minutesToTime(result.latestDepartureCaptainLocal)} LT`;
 
   document.getElementById("latestDepartureCaptainUtc").textContent =
     `${minutesToTime(result.latestDepartureCaptainUtc)} UTC`;
@@ -347,8 +363,12 @@ function renderResults(result) {
     infoText += ` Celková SBY byla ${minutesToDuration(result.sby)}.`;
     infoText += ` Pro krácení se počítá ${minutesToDuration(result.countableStandby)}.`;
 
-    if (result.sbyCallTime !== null && isNightMinute(result.sbyCallTime)) {
-      infoText += ` Call time ${minutesToTime(result.sbyCallTime)} spadl do 23:00–07:00, takže od call time do reportingu se vše počítá jako denní držení.`;
+    if (result.usePlanningCall && result.sbyCallTime !== null) {
+      if (isNightMinute(result.sbyCallTime)) {
+        infoText += ` Call time ${minutesToTime(result.sbyCallTime)} spadl do 23:00–07:00, takže od call time do reportingu se vše počítá jako denní držení.`;
+      } else {
+        infoText += ` Call time ${minutesToTime(result.sbyCallTime)} byl zadaný, ale neleží v 23:00–07:00, takže noční výjimka se nepoužila.`;
+      }
     }
 
     if (result.standbyReduction > 0) {
