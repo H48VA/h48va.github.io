@@ -1,4 +1,3 @@
-// Základní tabulka - lokální čas
 const BASE_TABLE = [
   { start: "00:00", end: "04:59", values: ["11:00", "11:00", "10:30", "10:00", "09:30"] },
   { start: "05:00", end: "05:14", values: ["12:00", "12:00", "11:30", "11:00", "10:30"] },
@@ -143,7 +142,6 @@ function calculateStandbyDurationFromStart(reportMinutes, sbyStartMinutes) {
 function calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes) {
   const standbyStart = reportMinutes - sbyMinutes;
   const standbyEnd = reportMinutes;
-
   let countable = 0;
   const firstDay = Math.floor(standbyStart / 1440);
   const lastDay = Math.floor((standbyEnd - 1) / 1440);
@@ -167,7 +165,6 @@ function calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes) {
 function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMinutes) {
   const standbyStart = reportMinutes - sbyMinutes;
   const standbyEnd = reportMinutes;
-
   let countable = calculateBaseCountableStandbyMinutes(reportMinutes, sbyMinutes);
 
   if (callTimeMinutes === null || callTimeMinutes === undefined) {
@@ -175,7 +172,6 @@ function calculateCountableStandbyMinutes(reportMinutes, sbyMinutes, callTimeMin
   }
 
   const normalizedCall = ((callTimeMinutes % 1440) + 1440) % 1440;
-
   if (!isNightMinute(normalizedCall)) {
     return countable;
   }
@@ -245,7 +241,6 @@ function calculateDelayLogic(originalReport, delayDuration, firstMessageTime, ha
       firstMessageLead,
       delayedReport,
       effectiveFdpStart: originalReport,
-      limitBasisReport: originalReport,
       delayDuration: 0,
       usedMoreLimitingRule: false,
       usedSecondMessageRule: false
@@ -253,14 +248,8 @@ function calculateDelayLogic(originalReport, delayDuration, firstMessageTime, ha
   }
 
   let effectiveFdpStart = delayedReport;
-  let limitBasisReport = originalReport;
-  let usedMoreLimitingRule = false;
+  let usedMoreLimitingRule = delayDuration >= 240;
   let usedSecondMessageRule = false;
-
-  if (delayDuration >= 240) {
-    limitBasisReport = null;
-    usedMoreLimitingRule = true;
-  }
 
   if (hasSecondDelayMessage && secondMessageTime !== null) {
     const secondMessageStart = secondMessageTime + 60;
@@ -274,7 +263,6 @@ function calculateDelayLogic(originalReport, delayDuration, firstMessageTime, ha
     firstMessageLead,
     delayedReport,
     effectiveFdpStart,
-    limitBasisReport,
     delayDuration,
     usedMoreLimitingRule,
     usedSecondMessageRule
@@ -320,7 +308,6 @@ function calculateResults() {
         firstMessageLead: 0,
         delayedReport: originalReport,
         effectiveFdpStart: originalReport,
-        limitBasisReport: originalReport,
         delayDuration: 0,
         usedMoreLimitingRule: false,
         usedSecondMessageRule: false
