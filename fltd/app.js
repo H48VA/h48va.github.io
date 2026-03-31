@@ -289,9 +289,9 @@ function calculateResults() {
   const utcOffset =
     utcOffsetHours + (utcOffsetHours < 0 ? -utcOffsetHalf / 60 : utcOffsetHalf / 60);
 
-  const sectors = parseInt(document.getElementById("sectors")?.value ?? "1", 10);
-  const lastLeg = toMinutes(document.getElementById("lastLeg")?.value || "00:00");
-  const taxi = toMinutes(document.getElementById("taxi")?.value || "00:00");
+  const sectors = parseInt(sectorsEl.value ?? "1", 10);
+  const lastLeg = toMinutes(lastLegEl.value || "00:00");
+  const taxi = toMinutes(taxiEl.value || "00:00");
   const serviceType = getSelectedServiceType();
 
   const hasDelayMessage = getSelectedHasDelayMessage();
