@@ -1,4 +1,4 @@
-const CACHE_NAME = "fdp-tool-v4";
+const CACHE_NAME = "fdp-tool-v5";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
