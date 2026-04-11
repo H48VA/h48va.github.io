@@ -174,9 +174,19 @@
       gap: 12px;
     }
 
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .result-grid { grid-template-columns: 1fr 1fr; }
+    }
+
     .result-box {
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 12px;
       background: var(--soft-blue);
       border: 1px solid rgba(0, 66, 137, 0.08);
     }
@@ -196,10 +206,10 @@
     }
 
     .result-value {
-      font-size: 28px;
+      font-size: 22px;
       font-weight: 900;
       color: var(--brand-blue);
-      line-height: 1.1;
+      line-height: 1.2;
     }
 
     .orange .result-value { color: #9a5a00; }
@@ -289,7 +299,7 @@
   <header class="app-header">
     <h1 class="title">FDP kalkulačka</h1>
     <p class="subtitle">
-      Tabulky běží v lokálním čase. Ve výsledcích uvidíš LT i UTC.
+      Zadávej v lokálním čase v místě reportingu. Ve výsledcích uvidíš LT i UTC.
     </p>
   </header>
 
@@ -319,8 +329,8 @@
             <option value="-2">UTC-2</option>
             <option value="-1">UTC-1</option>
             <option value="0">UTC±0</option>
-            <option value="1" selected>UTC+1</option>
-            <option value="2">UTC+2</option>
+            <option value="1">UTC+1</option>
+            <option value="2" selected>UTC+2</option>
             <option value="3">UTC+3</option>
             <option value="4">UTC+4</option>
             <option value="5">UTC+5</option>
@@ -435,7 +445,7 @@
 
         <div style="height:10px;"></div>
 
-        <label>Byl hovor z planningu?</label>
+        <label>Byl hovor z plánování?</label>
         <div class="segmented">
           <div>
             <input type="radio" id="planning-call-no" name="usePlanningCall" value="no" checked />
@@ -448,11 +458,11 @@
         </div>
 
         <div id="planningCallFields" style="display:none; margin-top:10px;">
-          <label for="sbyCallTime">Čas hovoru z planningu</label>
+          <label for="sbyCallTime">Čas hovoru z plánování</label>
           <input type="time" id="sbyCallTime" value="00:00" />
 
           <div class="hint">
-            Pokud call time padne mezi 23:00–07:00, od tohoto času do reportingu se vše počítá jako denní držení.
+            Pokud hovor spadá mezi 23:00–07:00, od tohoto času do reportingu se vše počítá jako denní držení.
           </div>
         </div>
       </div>
@@ -477,16 +487,18 @@
     <h2 class="section-title">Výsledky</h2>
 
     <div class="results">
-      <div class="result-box">
-        <div class="result-label">Maximální FDP</div>
-        <div class="result-value" id="maxFdp">--:--</div>
-        <div class="result-sub" id="fdpEndText">Konec duty: --:-- LT / --:-- UTC</div>
-      </div>
+      <div class="result-grid">
+        <div class="result-box">
+          <div class="result-label">Maximální FDP</div>
+          <div class="result-value" id="maxFdp">--:--</div>
+          <div class="result-sub" id="fdpEndText">Konec duty: --:-- LT / --:-- UTC</div>
+        </div>
 
-      <div class="result-box orange">
-        <div class="result-label">Maximální FDP s kapitánským prodloužením</div>
-        <div class="result-value" id="maxFdpCaptain">--:--</div>
-        <div class="result-sub" id="fdpEndCaptainText">Konec duty: --:-- LT / --:-- UTC</div>
+        <div class="result-box orange">
+          <div class="result-label">Maximální FDP s kapitánským prodloužením</div>
+          <div class="result-value" id="maxFdpCaptain">--:--</div>
+          <div class="result-sub" id="fdpEndCaptainText">Konec duty: --:-- LT / --:-- UTC</div>
+        </div>
       </div>
 
       <div class="small-grid">
