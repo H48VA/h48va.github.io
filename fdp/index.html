@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
@@ -86,6 +86,12 @@
 
     @media (min-width: 640px) {
       .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .input-block {
+      display: grid;
+      gap: 12px;
+      grid-column: 1 / -1;
     }
 
     .field label {
@@ -397,90 +403,94 @@
         </div>
       </div>
 
-      <div class="field">
-        <label>Přišla zpráva o zpoždění letu?</label>
-        <div class="segmented">
-          <div>
-            <input type="radio" id="delay-no" name="hasDelayMessage" value="no" checked />
-            <label for="delay-no">Ne</label>
-          </div>
-          <div>
-            <input type="radio" id="delay-yes" name="hasDelayMessage" value="yes" />
-            <label for="delay-yes">Ano</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="field subpanel" id="delayFields">
-        <label for="delayDuration">Doba zpoždění</label>
-        <input type="time" id="delayDuration" value="00:00" />
-
-        <div style="height:10px;"></div>
-
-        <label for="firstDelayMessageTime">Čas 1. zprávy</label>
-        <input type="time" id="firstDelayMessageTime" value="10:00" />
-
-        <div class="nested-panel">
-          <label>Přišla 2. zpráva?</label>
+      <div class="input-block">
+        <div class="field">
+          <label>Přišla zpráva o zpoždění letu?</label>
           <div class="segmented">
             <div>
-              <input type="radio" id="second-delay-no" name="hasSecondDelayMessage" value="no" checked />
-              <label for="second-delay-no">Ne</label>
+              <input type="radio" id="delay-no" name="hasDelayMessage" value="no" checked />
+              <label for="delay-no">Ne</label>
             </div>
             <div>
-              <input type="radio" id="second-delay-yes" name="hasSecondDelayMessage" value="yes" />
-              <label for="second-delay-yes">Ano</label>
+              <input type="radio" id="delay-yes" name="hasDelayMessage" value="yes" />
+              <label for="delay-yes">Ano</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field subpanel" id="delayFields">
+          <label for="delayDuration">Doba zpoždění</label>
+          <input type="time" id="delayDuration" value="00:00" />
+
+          <div style="height:10px;"></div>
+
+          <label for="firstDelayMessageTime">Čas 1. zprávy</label>
+          <input type="time" id="firstDelayMessageTime" value="10:00" />
+
+          <div class="nested-panel">
+            <label>Přišla 2. zpráva?</label>
+            <div class="segmented">
+              <div>
+                <input type="radio" id="second-delay-no" name="hasSecondDelayMessage" value="no" checked />
+                <label for="second-delay-no">Ne</label>
+              </div>
+              <div>
+                <input type="radio" id="second-delay-yes" name="hasSecondDelayMessage" value="yes" />
+                <label for="second-delay-yes">Ano</label>
+              </div>
+            </div>
+
+            <div id="secondDelayFields" class="nested-panel" style="display:none; margin-top:10px;">
+              <label for="secondDelayMessageTime">Čas 2. zprávy</label>
+              <input type="time" id="secondDelayMessageTime" value="11:00" />
             </div>
           </div>
 
-          <div id="secondDelayFields" class="nested-panel" style="display:none; margin-top:10px;">
-            <label for="secondDelayMessageTime">Čas 2. zprávy</label>
-            <input type="time" id="secondDelayMessageTime" value="11:00" />
-          </div>
-        </div>
-
-        <div class="hint">
-          1. zpráva se použije jen pokud přišla alespoň 90 minut před původním reportingem.
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Byl před reportingem SBY?</label>
-        <div class="segmented">
-          <div>
-            <input type="radio" id="sby-no" name="hasSby" value="no" checked />
-            <label for="sby-no">Ne</label>
-          </div>
-          <div>
-            <input type="radio" id="sby-yes" name="hasSby" value="yes" />
-            <label for="sby-yes">Ano</label>
+          <div class="hint">
+            1. zpráva se použije jen pokud přišla alespoň 90 minut před původním reportingem.
           </div>
         </div>
       </div>
 
-      <div class="field subpanel" id="sbyFields">
-        <label for="sbyStart">Začátek SBY</label>
-        <input type="time" id="sbyStart" value="00:00" />
-
-        <div class="nested-panel">
-          <label>Byl hovor z plánování?</label>
+      <div class="input-block">
+        <div class="field">
+          <label>Byl před reportingem SBY?</label>
           <div class="segmented">
             <div>
-              <input type="radio" id="planning-call-no" name="usePlanningCall" value="no" checked />
-              <label for="planning-call-no">Ne</label>
+              <input type="radio" id="sby-no" name="hasSby" value="no" checked />
+              <label for="sby-no">Ne</label>
             </div>
             <div>
-              <input type="radio" id="planning-call-yes" name="usePlanningCall" value="yes" />
-              <label for="planning-call-yes">Ano</label>
+              <input type="radio" id="sby-yes" name="hasSby" value="yes" />
+              <label for="sby-yes">Ano</label>
             </div>
           </div>
+        </div>
 
-          <div id="planningCallFields" class="nested-panel" style="display:none; margin-top:10px;">
-            <label for="sbyCallTime">Čas hovoru z plánování</label>
-            <input type="time" id="sbyCallTime" value="00:00" />
+        <div class="field subpanel" id="sbyFields">
+          <label for="sbyStart">Začátek SBY</label>
+          <input type="time" id="sbyStart" value="00:00" />
 
-            <div class="hint">
-              Pokud hovor spadá mezi 23:00–07:00, od tohoto času do reportingu se vše počítá jako denní držení.
+          <div class="nested-panel">
+            <label>Byl hovor z plánování?</label>
+            <div class="segmented">
+              <div>
+                <input type="radio" id="planning-call-no" name="usePlanningCall" value="no" checked />
+                <label for="planning-call-no">Ne</label>
+              </div>
+              <div>
+                <input type="radio" id="planning-call-yes" name="usePlanningCall" value="yes" />
+                <label for="planning-call-yes">Ano</label>
+              </div>
+            </div>
+
+            <div id="planningCallFields" class="nested-panel" style="display:none; margin-top:10px;">
+              <label for="sbyCallTime">Čas hovoru z plánování</label>
+              <input type="time" id="sbyCallTime" value="00:00" />
+
+              <div class="hint">
+                Pokud hovor spadá mezi 23:00–07:00, od tohoto času do reportingu se vše počítá jako denní držení.
+              </div>
             </div>
           </div>
         </div>
